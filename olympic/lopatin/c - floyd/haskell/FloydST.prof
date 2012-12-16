@@ -1,0 +1,29 @@
+	Wed Mar 14 00:35 2012 Time and Allocation Profiling Report  (Final)
+
+	   FloydST.exe +RTS -p -sstderr -RTS
+
+	total time  =        2.70 secs   (135 ticks @ 20 ms)
+	total alloc = 314,612,256 bytes  (excludes profiling overheads)
+
+COST CENTRE                    MODULE               %time %alloc
+
+main                           Main                  99.3   96.8
+printMatrix                    Main                   0.7    3.1
+
+
+                                                                                               individual    inherited
+COST CENTRE              MODULE                                               no.    entries  %time %alloc   %time %alloc
+
+MAIN                     MAIN                                                   1           0   0.0    0.0   100.0  100.0
+ main                    Main                                                 272           4  99.3   96.8   100.0  100.0
+  b2w                    Main                                                 276           0   0.0    0.1     0.0    0.1
+  printMatrix            Main                                                 274       10000   0.7    3.1     0.7    3.1
+ CAF                     Main                                                 266          24   0.0    0.0     0.0    0.0
+  printMatrix            Main                                                 277           0   0.0    0.0     0.0    0.0
+  b2w                    Main                                                 275           1   0.0    0.0     0.0    0.0
+  main                   Main                                                 273           0   0.0    0.0     0.0    0.0
+ CAF                     Data.Typeable                                        255           2   0.0    0.0     0.0    0.0
+ CAF                     Data.HashTable                                       214           3   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Handle.FD                                     196           2   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.FD                                            178           9   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Encoding.CodePage                             168           1   0.0    0.0     0.0    0.0

@@ -1,0 +1,40 @@
+	Wed Mar 14 00:29 2012 Time and Allocation Profiling Report  (Final)
+
+	   Floyd.exe +RTS -p -sstderr -RTS
+
+	total time  =        0.44 secs   (22 ticks @ 20 ms)
+	total alloc =  62,424,724 bytes  (excludes profiling overheads)
+
+COST CENTRE                    MODULE               %time %alloc
+
+forMatrix                      Main                  72.7    3.7
+printMatrix                    Main                   9.1   16.8
+forIndices                     Main                   9.1   71.0
+readNum                        Main                   4.5    2.2
+readMatrix                     Main                   4.5    0.8
+main                           Main                   0.0    5.4
+
+
+                                                                                               individual    inherited
+COST CENTRE              MODULE                                               no.    entries  %time %alloc   %time %alloc
+
+MAIN                     MAIN                                                   1           0   0.0    0.0   100.0  100.0
+ main                    Main                                                 280           3   0.0    5.4   100.0  100.0
+  printMatrix            Main                                                 291       10000   9.1   16.8     9.1   16.8
+  forIndices             Main                                                 289           1   9.1   71.0     9.1   71.0
+  forMatrix              Main                                                 288           1  72.7    3.7    72.7    3.7
+  readMatrix             Main                                                 283           1   4.5    0.8     9.1    3.1
+   readNum               Main                                                 287       10000   4.5    2.2     4.5    2.2
+   newMatrix             Main                                                 284           1   0.0    0.0     0.0    0.0
+  readNum                Main                                                 282           1   0.0    0.0     0.0    0.0
+ CAF                     Main                                                 274          14   0.0    0.0     0.0    0.0
+  printMatrix            Main                                                 292           0   0.0    0.0     0.0    0.0
+  forIndices             Main                                                 290           0   0.0    0.0     0.0    0.0
+  readMatrix             Main                                                 286           0   0.0    0.0     0.0    0.0
+  newMatrix              Main                                                 285           0   0.0    0.0     0.0    0.0
+  main                   Main                                                 281           0   0.0    0.0     0.0    0.0
+ CAF                     Data.Typeable                                        263           2   0.0    0.0     0.0    0.0
+ CAF                     Data.HashTable                                       222           3   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Handle.FD                                     204           2   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.FD                                            186           9   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Encoding.CodePage                             176           1   0.0    0.0     0.0    0.0

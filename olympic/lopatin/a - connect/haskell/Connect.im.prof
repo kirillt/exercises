@@ -1,0 +1,35 @@
+	Mon Feb 20 00:39 2012 Time and Allocation Profiling Report  (Final)
+
+	   Connect.im.exe +RTS -p -sstderr -RTS
+
+	total time  =        7.82 secs   (391 ticks @ 20 ms)
+	total alloc = 866,377,476 bytes  (excludes profiling overheads)
+
+COST CENTRE                    MODULE               %time %alloc
+
+merge                          Main                  96.9   97.1
+readPair                       Main                   1.5    2.2
+readEdge                       Main                   1.0    0.5
+
+
+                                                                                               individual    inherited
+COST CENTRE              MODULE                                               no.    entries  %time %alloc   %time %alloc
+
+MAIN                     MAIN                                                   1           0   0.0    0.0   100.0  100.0
+ main                    Main                                                 268           2   0.3    0.0   100.0  100.0
+  readEdges              Main                                                 272       90001   0.3    0.1    99.7  100.0
+   readEdge              Main                                                 273       90001   1.0    0.5    99.5   99.9
+    merge                Main                                                 275       90000  96.9   97.1    96.9   97.1
+    readPair             Main                                                 274      180001   1.5    2.2     1.5    2.2
+  graph                  Main                                                 271           1   0.0    0.0     0.0    0.0
+   edges                 Main                                                 277           1   0.0    0.0     0.0    0.0
+   nodes                 Main                                                 276           1   0.0    0.0     0.0    0.0
+  readPair               Main                                                 270           2   0.0    0.0     0.0    0.0
+ CAF                     Main                                                 262           2   0.0    0.0     0.0    0.0
+  main                   Main                                                 269           0   0.0    0.0     0.0    0.0
+ CAF                     Data.Typeable                                        251           2   0.0    0.0     0.0    0.0
+ CAF                     Data.HashTable                                       210           3   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Handle.FD                                     192           2   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.FD                                            174           6   0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Encoding.CodePage                             164           1   0.0    0.0     0.0    0.0
+ CAF                     Data.Array.Base                                      154           1   0.0    0.0     0.0    0.0
