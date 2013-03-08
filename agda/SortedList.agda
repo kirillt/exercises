@@ -2,18 +2,33 @@ module SortedList where
 
     import Level
     open import IO
+    open import Function
     open import Data.Nat
     open import Data.Bool
+    open import Data.List
+    open import Data.String
 
-    open import Relation.Binary
+    asclist : List ℕ
+    asclist = 1 ∷ 2 ∷ 3 ∷ []
 
-    Order = Rel ℕ Level.zero
+    deslist : List ℕ
+    deslist = 3 ∷ 2 ∷ 1 ∷ []
 
-    ascending : Order
-    ascending l r = l < r
+    Order : ∀ {a} → Set a → Set a
+    Order A = A → A → Bool
 
-    data SortedList  (A : Set) (O : Order) : Set where
-        Nil  : SortedList A O 
-        Cons : A -> SortedList A O -> SortedList A O
+    ascending : Order ℕ
+    ascending 0 _ = true
+    ascending _ 0 = false
+    ascending (suc n) (suc m) = ascending n m
 
-    main = run (putStrLn "")
+    descending : Order ℕ
+    descending x y = ascending y x
+
+    verify : ∀ {a} → ∀ {A : Set a} → Order A → List A → Bool
+    verify         _      []    = true
+    verify {a} {A} o (x ∷ list) = (verify' x list)
+        where
+            verify' : A → List A → Bool
+            verify' x      []    = true
+            verify' x (y ∷ list) = o x y ∧ (verify' y list)
