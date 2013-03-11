@@ -7,28 +7,38 @@ module SortedList where
     open import Data.Bool
     open import Data.List
     open import Data.String
+    open import Data.Product
+    open import Relation.Nullary.Core
 
-    asclist : List ℕ
-    asclist = 1 ∷ 2 ∷ 3 ∷ []
+    -- Abstract Data Type -------------------------------------------------------------------------------
 
-    deslist : List ℕ
-    deslist = 3 ∷ 2 ∷ 1 ∷ []
+    module Core (a : Level.Level) (A : Set a) (_≤'_ : A → A → Set a) (_≤?'_ : ∀ x y → Dec (x ≤' y)) where
 
-    Order : ∀ {a} → Set a → Set a
-    Order A = A → A → Bool
+        data Sorted : List A → (Set a) where
+            base : Sorted []
+            sing : ∀ {x} → Sorted (x ∷ [])
+            step : ∀ {x y ts} → x ≤' y → Sorted (y ∷ ts) → Sorted (x ∷ y ∷ ts)
 
-    ascending : Order ℕ
-    ascending 0 _ = true
-    ascending _ 0 = false
-    ascending (suc n) (suc m) = ascending n m
+        sorted?  : (list : List A) → Dec (Sorted list)
+        sorted?          []  = yes base
+        sorted? (    x ∷ []) = yes sing
+        sorted? (x ∷ y ∷ ts) with x ≤?' y | sorted? (y ∷ ts)
+        ... | yes x≤y | yes sorted = yes (step x≤y sorted)
+        ... | yes x≤y | no ¬sorted = no λ { (step a b) → ¬sorted b }
+        ... | no ¬x≤y | _          = no λ { (step a b) → ¬x≤y    a }
 
-    descending : Order ℕ
-    descending x y = ascending y x
+    -----------------------------------------------------------------------------------------------------
 
-    verify : ∀ {a} → ∀ {A : Set a} → Order A → List A → Bool
-    verify         _      []    = true
-    verify {a} {A} o (x ∷ list) = (verify' x list)
-        where
-            verify' : A → List A → Bool
-            verify' x      []    = true
-            verify' x (y ∷ list) = o x y ∧ (verify' y list)
+    open Core Level.zero ℕ _≤_ _≤?_
+
+    s?    : (list : List ℕ) → Dec (Sorted list)
+    s?    = sorted?
+    
+    _x_   : ℕ → List ℕ → List ℕ
+    a x b = a ∷ b
+
+    list1 : List ℕ
+    list1 = 1 ∷ 2 ∷ 3 ∷ []
+
+    list2 : List ℕ
+    list2 = 3 ∷ 2 ∷ 1 ∷ []
