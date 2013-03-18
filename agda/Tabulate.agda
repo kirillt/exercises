@@ -18,7 +18,16 @@ module Tabulate where
   _!_      {suc _} (x ∷ xs)  fzero   = x
   _!_      {suc _} (x ∷ xs) (fsuc n) = xs ! n
 
-  open import Relation.Binary.PropositionalEquality
+  open import Relation.Binary.PropositionalEquality hiding (cong)
+
+  cong : {A B : Set} → {x y : A} → (f : A → B) → x ≡ y → f x ≡ f y
+  cong {_} {_} {x} {.x} f refl = refl
 
   !∘tabulate≡id : {n : ℕ} → {i : Fin n} → {A : Set} → (f : Fin n → A) → tabulate f ! i ≡ f i
-  !∘tabulate≡id = {!!}
+  !∘tabulate≡id {zero } {()}     _
+  !∘tabulate≡id {suc n} {fzero } _ = refl
+  !∘tabulate≡id {suc n} {fsuc k} _ = !∘tabulate≡id {n} {k} _
+
+  tabulate∘!≡id : {n : ℕ} → {A : Set} → (xs : Vec A n) → tabulate (_!_ xs) ≡ xs
+  tabulate∘!≡id {zero }      []  = refl
+  tabulate∘!≡id {suc n} (h ∷ ts) = cong (λ ts' → h ∷ ts') (tabulate∘!≡id ts)
