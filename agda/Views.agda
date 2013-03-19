@@ -1,8 +1,9 @@
 module Views where
 
-  module Parity where
+  open import Data.Nat
+  open import Data.List
 
-    open import Data.Nat
+  module Parity where
 
     data Parity : ℕ → Set where
       even : (k : ℕ) → Parity (    k * 2)
@@ -19,11 +20,10 @@ module Views where
     half .(    k * 2) | even k = k
     half .(1 + k * 2) | odd  k = k
 
-  module Lists where
+  module ListsAndPredicates where
 
     open import Function
     open import Data.Bool
-    open import Data.List
 
     data All {A : Set} (P : A → Set) : List A → Set where
       [all]   : All P []
@@ -55,7 +55,7 @@ module Views where
     ... | false |                _  = filter-satisfies xs p
 
     data Find {A : Set} (p : A → Bool) : List A → Set where
-      found     : (xs zs : List A) → (y : A) → satisfies p y → Find p (xs ++ y ∷ zs)
+      found     : (pre post : List A) → (x : A) → satisfies p x → Find p (pre ++ x ∷ post)
       not-found : {xs    : List A} → All (satisfies (not ∘ p)) xs → Find p xs
 
     find : {A : Set} → (p : A → Bool) → (xs : List A) → Find p xs
@@ -64,4 +64,27 @@ module Views where
     ... | true  | Reveal_is_.[_] eq = found [] xs x (trueIsTrue eq)
     ... | false | Reveal_is_.[_] eq with find p xs
     find p (x ∷ xs) | false | Reveal_is_.[_] eq | not-found        proof = not-found ((falseIsFalse eq) :all: proof)
-    find p (x ∷ ._) | false | Reveal_is_.[_] eq | found pre post y proof = found (x ∷ pre) post y proof 
+    find p (x ∷ ._) | false | Reveal_is_.[_] eq | found pre post y proof = found (x ∷ pre) post y proof
+
+  module ListsAndIndexing where
+
+    data _∈_ {A : Set} (x : A) : List A → Set where
+        hd : {xs : List A} → x ∈ xs
+        tl : {ys : List A} → x ∈ ys → {y : A} → x ∈ (y ∷ ys)
+        
+    index : {A : Set} → {xs : List A} → {x : A} → x ∈ xs → ℕ
+    index  hd       = zero
+    index (tl rest) = suc (index rest)
+
+    data Lookup {A : Set} (xs : List A) : ℕ → Set where
+      inside  : (x : A) → (x∈xs : x ∈ xs) → Lookup xs (index x∈xs)
+      outside : {n : ℕ} → Lookup xs (length xs + n)
+
+    _!_ : {A : Set} → (xs : List A) → (i : ℕ) → Lookup xs i
+    (    []) !      i  = outside
+    (x ∷ xs) !      0  = inside x hd
+    (x ∷ xs) ! suc i with xs ! i
+    (x ∷ xs) ! suc .(index   proof) | inside  y proof = inside y (tl proof)
+    (x ∷ xs) ! suc .(length xs + i) | outside {i}     = outside
+    
+    
