@@ -10,8 +10,6 @@ module SortedList where
     open import Data.Product
     open import Relation.Nullary.Core
 
-    -- Abstract Data Type -------------------------------------------------------------------------------
-
     module Core (a : Level.Level) (A : Set a) (_≤_ : A → A → Set a) (_≤?_ : ∀ x y → Dec (x ≤ y)) (≰⇒≤ : {a b : A} → (¬(a ≤ b)) → (b ≤ a)) where
 
 
@@ -67,8 +65,6 @@ module SortedList where
                         consagain : SortedList → SortedList
                         consagain (pack      []  _      ) = pack (    x ∷ []) sing
                         consagain (pack (q ∷ ss) sorted') = pack (x ∷ q ∷ ss) (step {!!} sorted')
-
-    -----------------------------------------------------------------------------------------------------
 
     open import Data.Nat
     open import Data.Nat.Properties
