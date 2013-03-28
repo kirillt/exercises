@@ -69,9 +69,6 @@ module Draft01 where
   isFalse false = False
   isFalse _     = True
 
-  -- TODO: may be it is necessary to represent Aryph/Bool semantics with datatype, too (like Transition)?
-  -- TODO: or may be there can be applied idea from paper "Reflection Proofs" about proof by reflection?
-  
   _<<_>> : State → B → Bool
   s << const x   >> = x
   s << conj  x y >> = (s << x >>) ∧ (s << y >>)
