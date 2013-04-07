@@ -1,7 +1,7 @@
 module Draft02 where
 
   open import Data.Nat
-  open import Data.List
+  open import Data.List hiding (reverse)
   open import Data.Bool
   open import Data.String
   open import Relation.Binary.PropositionalEquality
@@ -85,11 +85,11 @@ module Draft02 where
   s << eq    x y >> = eq-nat (s [[ x ]]) (s [[ y ]])
     
   data S : Set where
-    skip  : S
-    comp  : S → S → S
-    as    : Variable → ℕ → S
-    if-then-else : B → S → S → S
-    while : B → S → S
+    skip   : S
+    comp   : S → S → S
+    assign : Variable → ℕ → S
+    branch : B → S → S → S
+    while  : B → S → S
 
   open import Data.Maybe
 
@@ -98,28 +98,28 @@ module Draft02 where
     field
       state   : State
       program : Maybe S
-    
+
   data Transition (s₁ : State) : S → Control → Set where
-    [skip]   :             Transition s₁   skip   [>            s₁ , nothing <]
-    [assign] : ∀ {k v } → Transition s₁ (as k v) [> (k , v) |> s₁ , nothing <]
-    [comp-j] : ∀ {s₂} (p₁ p₂ p₃ : S) → Transition s₁       p₁     [> s₂ , just       p₃      <]
-                                        → Transition s₁ (comp p₁ p₂) [> s₂ , just (comp p₃ p₂) <]
---    [comp-n] : ∀ {s₂} (p₁ p₂     : S) → Transition s₁       p₁     [> s₂ , nothing <]
---                                         → Transition s₁ (comp p₁ p₂) [> s₂ , just p₂ <]
-    [if-t]   : ∀ (b : B) (p₁ p₂ : S) → isTrue (     s₁ << b >> )
-                                         → Transition s₁ (if-then-else b p₁ p₂) [> s₁ , just p₁ <]
-    [if-f]   : ∀ (b : B) (p₁ p₂ : S) → isTrue (not (s₁ << b >>))
-                                         → Transition s₁ (if-then-else b p₁ p₂) [> s₁ , just p₂ <]
-    
-  record Interpretation (s₁ : State) (p₁ : S) : Set where
+    [skip]   :             Transition s₁   skip       [>            s₁ , nothing <]
+    [assign] : ∀ {k v } → Transition s₁ (assign k v) [> (k , v) |> s₁ , nothing <]
+    [comp-j] : ∀ {s₂ p₁ p₂ p₃} → Transition s₁       p₁     [> s₂ , just       p₃      <]
+                                  → Transition s₁ (comp p₁ p₂) [> s₂ , just (comp p₃ p₂) <]
+    [comp-n] : ∀ {s₂ p₁ p₂    } → Transition s₁       p₁     [> s₂ , nothing <]
+                                  → Transition s₁ (comp p₁ p₂) [> s₂ , just p₂ <]
+--    [if-t]   : ∀ (b : B) (p₁ p₂ : S) → isTrue (     s₁ << b >> )
+--                                         → Transition s₁ (branch b p₁ p₂) [> s₁ , just p₁ <]
+--    [if-f]   : ∀ (b : B) (p₁ p₂ : S) → isTrue (not (s₁ << b >>))
+--                                         → Transition s₁ (branch b p₁ p₂) [> s₁ , just p₂ <]
+
+  record Interpretation (s₁ : State) (p : S) : Set where
     constructor I_,_I
     field
       control    : Control
-      transition : Transition s₁ p₁ control
-    
-  interpret : (s₁ : State) → (p₁ : S) → Interpretation s₁ p₁
-  interpret s₁  skip                   = I [> s₁ , nothing <] , [skip] I
-  interpret s₁ (as   k v             ) = I [> (k , v) |> s₁ , nothing <] , [assign] I
-  interpret s₁ (comp           p₁ p₂) = {!-t 180 from-just!}
-  interpret s₁ (if-then-else b p₁ p₂) = {!!}
-  interpret s₁ (while        b p     ) = {!!}
+      transition : Transition s₁ p control
+
+  interpret : (s : State) → (p : S) → Interpretation s p
+  interpret s₁  skip             = {!!}
+  interpret s₁ (assign   k   v ) = {!!}
+  interpret s₁ (comp     p₁ p₂) = {!!}
+  interpret s₁ (branch b p₁ p₂) = {!!}
+  interpret s₁ (while  b p     ) = {!!}

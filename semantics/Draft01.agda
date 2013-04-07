@@ -69,6 +69,14 @@ module Draft01 where
   isFalse false = False
   isFalse _     = True
 
+  open import Relation.Binary.PropositionalEquality
+
+  trueIsTrue : {x : Bool} → x ≡ true → isTrue x
+  trueIsTrue refl = _
+
+  falseIsFalse : {x : Bool} → x ≡ false → isFalse x
+  falseIsFalse refl = _
+  
   _<<_>> : State → B → Bool
   s << const x   >> = x
   s << conj  x y >> = (s << x >>) ∧ (s << y >>)
@@ -83,52 +91,65 @@ module Draft01 where
     if-then-else : B → S → S → S
     while : B → S → S
 
-  data Transition (s₁ : State) : (s₂ : State) → S → Set where
-    [skip] : Transition s₁ s₁ skip
-    [as]   : ∀ {v n} → Transition s₁ ((v , n) |> s₁) (as v n)
-    [comp] : ∀ {o₁ o₂ s₂ s₃} → Transition s₁ s₂ o₁ → Transition s₂ s₃ o₂ → Transition s₁ s₃ (comp o₁ o₂)
-    
-    [ift]  : ∀ {o₁ o₂ s₂ b} → isTrue  (s₁ << b >>) →
-                   Transition s₁ s₂ o₁ → Transition s₁ s₂ (if-then-else b o₁ o₂)
-    [iff]  : ∀ {o₁ o₂ s₂ b} → isFalse (s₁ << b >>) →
-                   Transition s₁ s₂ o₂ → Transition s₁ s₂ (if-then-else b o₁ o₂)
-                   
-    [wlt]  : ∀ {o s₂ b} → isTrue (s₁ << b >>) →
-                   Transition s₁ s₂ o → Transition s₁ s₂ (while b o)
-    [wlf]  : ∀ {o b} → isFalse (s₁ << b >>) →
-                   Transition s₁ s₁ (while b o)
+  mutual
+    data Transition (s₁ : State) : (s₂ : State) → S → Set where
+      [skip] : Transition s₁ s₁ skip
+      [as]   : ∀ {v n} → Transition s₁ ((v , n) |> s₁) (as v n)
+      [comp] : ∀ (o₁ o₂ : S) → ∀ {s₂ s₃} → Transition s₁ s₂ o₁ → Transition s₂ s₃ o₂ → Transition s₁ s₃ (comp o₁ o₂)
 
-  record Interpretation (s₁ : State) (p : S) : Set where
-    constructor _,_
-    field
-        state      : State
-        transition : Transition s₁ state p
+--      [comp] : ∀ (o₁ o₂ : S) → Transition s₁(state' (interpret o₁ s₁)) o₁ →
+--        Transition (state' (interpret o₁ s₁)) (state' (interpret o₂ (state' (interpret o₁ s₁)))) o₂ →
+--        Transition s₁ (state' (interpret o₂ (state' (interpret o₁ s₁)))) (comp o₁ o₂)
 
-  open Interpretation
+--      [comp] : ∀ (o₁ o₂ : S) → Transition s₁ (state' (interpret o₂ (state' (interpret o₁ s₁)))) (comp o₁ o₂)
 
-  interpret : (p : S) → (s₁ : State) → Interpretation s₁ p
-  
---  interpret skip s = result s [skip]
-  interpret skip s = {!!}
+      [ift]  : ∀ {o₁ o₂ s₂ b} → isTrue  (s₁ << b >>) →
+                     Transition s₁ s₂ o₁ → Transition s₁ s₂ (if-then-else b o₁ o₂)
+      [iff]  : ∀ {o₁ o₂ s₂ b} → isFalse (s₁ << b >>) →
+                     Transition s₁ s₂ o₂ → Transition s₁ s₂ (if-then-else b o₁ o₂)
 
---  interpret (comp y₁ y₂) s₁ with interpret y₁ s₁
---  ... | result s₂ tr₁ with interpret y₂ s₂
---  ...     | result s₃ tr₂ = result s₃ ([comp] tr₁ tr₂)
+      [wlt]  : ∀ {o s₂ b} → isTrue (s₁ << b >>) →
+                     Transition s₁ s₂ o → Transition s₁ s₂ (while b o)
+      [wlf]  : ∀ {o b} → isFalse (s₁ << b >>) →
+                     Transition s₁ s₁ (while b o)
 
---  interpret (comp y₁ y₂) s₁ = (state (interpret y₂ (state (interpret y₁ s₁)))) ,
---                                ([comp]
---                                    (transition (interpret y₁ s₁))
---                                    (transition (interpret y₂ (state (interpret y₁ s₁)))))
+    data Interpretation (s₁ : State) (p : S) : Set where
+      _,_ : (s₂ : State) → Transition s₁ s₂ p → Interpretation s₁ p
+      
+--    record Interpretation (s₁ : State) (p : S) : Set where
+--      constructor _,_
+--      field
+--          state      : State
+--          transition : Transition s₁ state p
 
-  interpret (comp y₁ y₂) s₁ = {!!}
-  
---  interpret (as y y') s = result ((y , y') |> s) [as]
-  interpret (as y y') s = {!!}
-  
-  interpret (if-then-else b o₁ o₂) s with s << b >>
-  ... | true  = {!!}
-  ... | false = {!!}
-  
-  interpret (while b o) s with s << b >>
-  ... | true  = {!!}
-  ... | false = {!!}
+    state' : ∀ {s₁ p} → Interpretation s₁ p → State
+    state' (s₂ , _) = s₂
+          
+    --open Interpretation
+
+    interpret : (p : S) → (s₁ : State) → Interpretation s₁ p
+
+  --  interpret skip s = result s [skip]
+    interpret skip s = s , [skip]
+
+  --  interpret (comp y₁ y₂) s₁ with interpret y₁ s₁
+  --  ... | result s₂ tr₁ with interpret y₂ s₂
+  --  ...     | result s₃ tr₂ = result s₃ ([comp] tr₁ tr₂)
+
+  --  interpret (comp y₁ y₂) s₁ = (state (interpret y₂ (state (interpret y₁ s₁)))) ,
+  --                                ([comp]
+  --                                    (transition (interpret y₁ s₁))
+  --                                    (transition (interpret y₂ (state (interpret y₁ s₁)))))
+
+    interpret (comp y₁ y₂) s₁ = {!!}
+
+  --  interpret (as y y') s = result ((y , y') |> s) [as]
+    interpret (as y y') s = ((y , y') |> s) , [as]
+
+    interpret (if-then-else b o₁ o₂) s with s << b >>
+    ... | true  = {!!}
+    ... | false = {!!}
+
+    interpret (while b o) s with (_<<_>> s) b | inspect (_<<_>> s) b
+    ... | true  | Reveal_is_.[_] q = {!!}
+    ... | false | Reveal_is_.[_] q = s , [wlf] (falseIsFalse q)

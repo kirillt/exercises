@@ -1,5 +1,7 @@
 module Draft01
 
+  import Language.Reflection
+
   Value : Type
   Value = Nat
 
@@ -87,24 +89,12 @@ module Draft01
             Interpretation s p
 
   interpret : (p : ST) -> (s : State) -> Interpretation s p
-  
---  interpret skip s = result s [skip]
-  interpret skip s = ?skip
+  interpret st s = ?all
+  --interpret skip s = ?skip
+  --interpret (comp y1 y2) s1 = ?comp
+  --interpret (as k v) s = ?as
+  --interpret (branch b o1 o2) s = if cond s b then ?brt else ?brf
+  --interpret (while b o) s = if cond s b then ?wlt else ?wlf
 
---  interpret (comp y₁ y₂) s₁ with interpret y₁ s₁
---  ... | result s₂ tr₁ with interpret y₂ s₂
---  ...     | result s₃ tr₂ = result s₃ ([comp] tr₁ tr₂)
-
---  interpret (comp y₁ y₂) s₁ = (state (interpret y₂ (state (interpret y₁ s₁)))) ,
---                                ([comp]
---                                    (transition (interpret y₁ s₁))
---                                    (transition (interpret y₂ (state (interpret y₁ s₁)))))
-
-  interpret (comp y1 y2) s1 = ?comp
-  
---  interpret (as k v) s = result ((k , v) |> s) [as]
-  interpret (as k v) s = ?as
-  
-  interpret (branch b o1 o2) s = if cond s b then ?brt else ?brf
-  
-  interpret (while b o) s = if cond s b then ?wlt else ?wlf
+  bruteforce : Tactic
+  bruteforce = ?brute

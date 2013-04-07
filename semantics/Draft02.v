@@ -79,16 +79,15 @@ Record Control : Set := C
 
 Inductive Transition (s1 : State) : ST -> Control -> Set :=
   | TSkip  : Transition s1 skip (C s1 None)
-  | TAssign: forall (k : Name) (v : Value), Transition s1 (assign k v) (C (bind (KV k v) s1) None)
-  | TComp_n: forall (s2 : State) (o1 o2    : ST),
+  | TAssign: forall {k : Name} {v : Value}, Transition s1 (assign k v) (C (bind (KV k v) s1) None)
+  | TComp_n: forall {s2 : State} {o1 o2    : ST},
                Transition s1 o1 (C s2 None) -> Transition s1 (comp o1 o2) (C s2 None)
-  | TComp_s: forall (s2 : State) (o1 o2 o3 : ST),
+  | TComp_s: forall {s2 : State} {o1 o2 o3 : ST},
                Transition s1 o1 (C s2 (Some o3)) -> Transition s1 (comp o1 o2) (C s2 (Some (comp o3 o2)))
-  | TIf_t  : forall (s2    : State) (o1 o2 : ST) (b : B),
+  | TIf_t  : forall {s2 : State} {o1 o2 : ST} {b : B},
                isTrue  (cond s1 b) -> Transition s1 (branch b o1 o2) (C s1 (Some o1))
-  | TIf_f  : forall (s2    : State) (o1 o2 : ST) (b : B),
+  | TIf_f  : forall {s2 : State} {o1 o2 : ST} {b : B},
                isFalse (cond s1 b) -> Transition s1 (branch b o1 o2) (C s1 (Some o2)).
-
 
 Record Interpretation (s : State) (p : ST) : Set := I
   {control    : Control;
@@ -96,4 +95,25 @@ Record Interpretation (s : State) (p : ST) : Set := I
 
 Require Import CpdtTactics.
 
-Theorem interpret (p : ST) (s : State) : Interpretation s p.
+Definition final (s : State) : Control := C s None.
+
+Definition interpret (p : ST) (s : State) : Interpretation s p.
+Proof.
+
+  
+(*
+  induction p.
+  crush' final fail.
+  crush' TSkip fail.
+  crush' (I s skip i) fail.
+  induction IHp1.
+  induction control0.
+  induction program0.
+  Check TComp_s.
+  Check TComp_s s.
+  crush' (I s (comp p1 p2) (C state0 (Some (comp a p2))) (TComp_s s transition0)) fail.
+
+  match p with
+  | skip => I s skip (C s None) (TSkip s)
+  end.
+*)
