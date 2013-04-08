@@ -1,14 +1,137 @@
-1. Reflection -- можно получить тип всего выражения (goal) с помощью quoteGoal x in e.
+Failed: Agsy -- не справляется с мета-переменными в dependent record.
+
+----------------------------------
+
+0. Proof корректности компиляции.
+
+1. Emacs macro / standalone утилита для case split.
+
+2. Agda  Reflection -- можно получить тип всего выражения (goal) с помощью quoteGoal x in e.
     a) Может ли ReflectionProofs помочь?
     b) Можно ли как-то применить quoteGoal?
     c) Можно ли анализировать описание семантики?
         * Вроде как нельзя (нужна возможность исследовать induction data type).
         * Но может помочь reflection для значения idt (сделать лемму для использования в Agsy).
 
-2. Ограничения Agsy:
-    a) Не может автоматически делать with и case split.
-        * Можно заменить на функции case_of_ и проекции (field).
-    б) Не может выводить значения dependent record.
+3. Idris Reflection -- proof scripts, работает compile-time.
+    a) Нельзя использовать все функции из модуля -- придётся делать meta-programming.
+    b) Compile-time заполнение goal с помощью тактики -- proof script.
+        * reflect tactic_name
+        * tactic_name : Tactic
+        * пример: effects/Effects.idr
 
-3. Программный авто-вывод деревьев.
-    a) Idris?
+4. Idris run-time -- можно использовать Idris как proof-engine, но пока что нет хорошего API.
+
+5. Backtracking.
+
+[14:27] <MrFenix_> RC43: Idris has some forms of automatic proof search.. there is "compute" which will normalise the current proof environment, "refine" which takes a function and tries to apply it to known variables, and "trivial", which tries to automatically solve things as best as possible
+[14:28] <MrFenix_> Rc43: further there are proof scripts, which are reusable functions which compute proof tactics
+[14:29] <MrFenix_> Rc43: my last pull request is going to improve them by adding reflected versions of the proof environment and the goal
+[14:30] <MrFenix_> but full auto-proof won't work, since inhabitation for dependent types is undecidable
+[14:41] <Rc43> MrFenix, is "trivial" equivalent to brute-force? Does it tries to apply "refine" iteratively to every function it knows about?
+[14:42] <MrFenix_> Rc43: no.. trivial will try to normalise the environment and apply a few rewrite rules
+[14:42] <MrFenix_> otherwise it would run forever
+[14:43] <Rc43> MrFenix_, sometimes we know that something is true and just want to avoid manual coding. Agda's Agsy works so as I understand.
+[14:45] <MrFenix_> you can write a proof script which does this kind of thing.. not with all functions, but with a (reasonably) limited set (/list) of functions
+[14:45] <Rc43> MrFenix, ok, understood.
+[14:45] <Rc43> MrFenix_, and are these prooving means documented? I haven't found yet.
+[14:47] <MrFenix_> the proof script part is currently under development. examples are in the effects lib (search for Nat -> Tactic functions there) and for the improved stuff here: https://github.com/JanBessai/Idris-dev/blob/d479f4acaa46e2cb1650f8de153f2076c75f3f7b/samples/reflection.idr
+[14:47] <MrFenix_> the normal proof tactics are (roughly :( ) documented in the idris tutorial
+[14:48] <MrFenix_> and more advanced doc. is available in the implementation paper
+[14:47] <Rc43> MrFenix, ah, and the most important (for me): can these means be used at run-time? I want to implement program which will auto-infer some things.
+[14:48] <Rc43> MrFenix, ok, thanks.
+[14:48] <MrFenix_> no proving is restricted to compile time only
+[14:48] <MrFenix_> so every function you write to compute a proof will run at compile time
+[14:48] <tomprince> Well, you can write something that generates a proof, or fails.
+[14:51] <MrFenix_> Rc43: then probably proof scripts are the right way to go
+[14:51] <MrFenix_> take a look at the effects lib
+[14:52] <tomprince> Or, perhaps you just need to write a higher-order proof.
+[14:52] <tomprince> Rc43: What do you mean by run-time?
+[14:53] <MrFenix_> but you have to be aware, that there will be slight changes to the interface for that - nothing tragic though (tatcitc scripts will be required to take two more arguments, and their invocation will be renamed from "reflect" to "applyTactic")
+[14:55] <MrFenix_> for the runtime part: proofs are normalised at compile time, but if you make them higher order (which should be the natual way to pass arguments anyways), they will work with all values you insert at runtime
+[14:56] <Rc43> tomprince, not sure, I talked about program that reads some data, and then tries to proove "theorem". It is obviously possible if "proof" is just a value of some data type; but can we use special prooving means for it? (MrFenix already said that no)
+[14:56] <Rc43> But now I think compile-time is enough for me, user can input required data just like idris source file, it would be more convinient. Or may be it can be done with meta programming.
+[14:56] <MrFenix_> so instead of writing proof foo { let x = 3; exact x; } you'd write proof foo { intros; exact x } and attach that proof to a function Int -> Int
+[14:58] <MrFenix_> Rc43: the best way to go then is to create a reasonable data type to catch all your input data, read it at runtime and write your proofs on functions MyInputData -> Maybe PropertyToProof
+
+[14:58] <Rc43> MrFenix, are there proofs and theorems special values like in Coq or they are just inductive types / theirs values like in Agda?
+[15:03] <MrFenix_> Rc43: all proofs are just functions and can be implemented as such. if you add a "tactic" that will be interpreted in a special way to create a function from it. if you call a proof script (currently via reflect) this script will be a function creating a tactic (you find the datatype for that in Language.Reflect)
+[15:04] <Rc43> Ok, understood.
+[15:05] <Rc43> BTW, what I am trying to implement:
+[15:05] <Rc43> It is interpreter of operational semantics. My input is syntax definition and operational semantics (i.e. transition rules for syntax nodes).
+[15:05] <MrFenix_> :)
+[15:05] <Rc43> I need a function `interpret : AST -> state-begin -> state-end`.
+[15:05] <Rc43> But this function defines semantics second time, so it should be aboided (we already defined semantics with transition rules).
+[15:05] <Rc43> So I want to auto-infer it.
+[15:06] <Rc43> I tried to do it with Agda (http://hpaste.org/84645#line111), but maybe Idris is better for it.
+[15:07] <Rc43> I want try both Agda's reflection and Idris.
+[15:11] <MrFenix_> well then.. what you need is a function AST -> [Transition] -> Either Result AST which you can write using the usual backtracking facilities (Monads or Effects)
+[15:11] == cads [~m@c-76-17-110-13.hsd1.ga.comcast.net] has quit [Ping timeout: 252 seconds]
+[15:13] <Rc43> MrFenix_, I don't know about Effects yet, but don't see how Monads can help; and don't know about backatracking, too...
+[15:14] <MrFenix_> Rc43: I went through all this my self before :)
+[15:15] <MrFenix_> there are multiple layers to consider... first do you want AST to be generic or can it be fixed to a rosetree (Tree a = Node a [Tree a])?
+[15:15] <MrFenix_> (it does not have to be exactly that rep. but something similar)
+[15:16] <Rc43> MrFenix_, I would define it like on the line (data S, A, B)
+[15:16] <Rc43> *kink
+[15:16] <Rc43> *link
+[15:17] <Rc43> MrFenix_, or it is necessary for traversing?
+[15:17] <MrFenix_> ok that is a fixed representation
+[15:17] <Rc43> What is generic representation then?
+[15:18] <MrFenix_> one that can work on arbitrary ASTs
+[15:18] == mikurubeam [~suckmy@unaffiliated/dijkstragroupie] has quit [Read error: Connection reset by peer]
+[15:20] <MrFenix_> what you are trying to do is sos for one ast and one ruleset.. the other option would be to do it for any given ast and any given ruleset
+[15:20] == donri [~dag@unaffiliated/dagodenhall] has joined #idris
+[15:20] <MrFenix_> (which is harder of course)
+[15:21] <Rc43> sos stands for structural?
+[15:21] <MrFenix_> yes
+[15:21] <Rc43> here it is natural :)
+[15:21] <MrFenix_> ok, all the better :)
+[15:22] <MrFenix_> now, after being clear about that, you have to define the means of applying a transition
+[15:22] <Rc43> Wait a little.
+[15:23] <Rc43> Ah, nothing... continue.
+[15:23] == MrFenix_ [~JanB@p57A1A488.dip.t-dialin.net]
+[15:23] ==  realname : Unknown
+[15:23] ==  channels : #idris
+[15:23] ==  server   : zelazny.freenode.net [Corvallis, OR, USA]
+[15:23] == End of WHOIS
+[15:23] <MrFenix_> the most natural way I can come up with, is a function AST -> Transition -> Maybe AST
+[15:24] <MrFenix_> which returns nothing if the transition cannot be applied and Just the new AST if it worked
+[15:25] == mikurubeam [~suckmy@unaffiliated/dijkstragroupie] has joined #idris
+[15:25] <Rc43> What is new Ast? Like transition "if" generates "<a>" for "if true then <a> else <b>"?
+[15:25] <MrFenix_> yes
+[15:26] <MrFenix_> exactly
+[15:26] <MrFenix_> it may be augmented by a state of course, but that sould not be hard to add
+[15:28] <Rc43> Do you want to make Transition implicit here?
+[15:28] <MrFenix_> in a real world scenario this function also gets some error info and perhaps more
+[15:28] <MrFenix_> what do you mean by implicit?
+[15:28] <Rc43> (and we forgot begin-state)
+[15:29] <Rc43> MrFenix, Transition is a tree of rules, right? So we want to infer it, too.
+[15:29] <MrFenix_> no this is just for one fixed transition
+[15:30] <Rc43> ok
+[15:30] <MrFenix_> to extend it for a set of given transitions, you add backtracking
+[15:30] <Rc43> For searching first succesfull transition?
+[15:31] <MrFenix_> you write a function like AST -> [Transition] -> Maybe AST, which tries to apply every given transition using the function we have just written, and yields the first thing which did not fail
+[15:31] <Rc43> Yep, understood.
+[15:32] <Rc43> And [Transition] can be generated simply.
+[15:32] <MrFenix_> (all that mod State, Error Messages, ...)
+[15:32] <MrFenix_> yes :)
+[15:33] <MrFenix_> one slight detail: the "simple" function to run one transition will need the set of all transitions again, in order to simplify ast subcomponents
+[15:33] <MrFenix_> e.g. "if (f(x)) then a else b" will need to simplify f(x) first
+[15:34] <MrFenix_> but that will be just a recursive call to the toplevel function
+[15:35] <MrFenix_> when you are done a good place to improve all this will be oleg's logict: http://hackage.haskell.org/package/logict
+[15:35] <MrFenix_> (it would have to be ported of course.. but I'm interested in doing so ;))
+[15:36] <MrFenix_> it adds nicer means of backtracking by providing breadth-first search and similar stuff
+[15:36] <Rc43> Should we generate transitions in special order such we can "fast" go to next transition after fail of current? By "fast" I mean minimum of recalculation.
+[15:37] <MrFenix_> I believe, that this is language dependent
+[15:39] <Rc43> In other words, now we "backtrack" only one big step, but we can imlement search to be more granular and after fail backtrack only one small step instead of full work and picking next transition.
+[15:39] <MrFenix_> yes
+[15:40] <MrFenix_> that would be going from depth-first to breadth-first, I think
+
+[15:40] <Rc43> How can dependent types help here? It seems it can be implemented in haskell in the same way.
+[15:42] <MrFenix_> one possibility is to add heterogenious ASTs
+[15:43] <Rc43> GADTs?
+[15:43] <Rc43> AST parameterized with its type?
+[15:43] <MrFenix_> no more like http://hackage.haskell.org/packages/archive/language-java/0.2.2/doc/html/Language-Java-Syntax.html
+[15:43] <MrFenix_> here you have different types for about every node
+[15:44] <MrFenix_> and the result type of a transition can depend on the input data you get for this transition
+[15:46] <MrFenix_> in any real world use that would be the case.. (or you'd have to map the input ast to a generic representation like a rose-tree and work on that)
