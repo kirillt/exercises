@@ -1,3 +1,5 @@
+{-# OPTIONS --no-termination-check #-}
+
 module NaturalSemantics where
 
   open import Syntax
