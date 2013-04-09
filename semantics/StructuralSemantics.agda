@@ -56,3 +56,7 @@ module StructuralSemantics where
   interpret s₁ (while  b p     ) with s₁ << b >> | inspect (_<<_>> s₁) b
   ... | true  | Reveal_is_.[_] e = I [> s₁ , just p  <] , [while-t] b p (trueIsTrue     e) I
   ... | false | Reveal_is_.[_] e = I [> s₁ , nothing <] , [while-f] b p (falseIsNotTrue e) I
+
+  data Transition* (s₁ : State) : S → State → Set where
+    cons : ∀ {s₂ s₃ p₁ p₂} → Transition s₁ p₁ [> s₂ , just p₂ <] → Transition* s₂ p₂ s₃ → Transition* s₁ p₁ s₃
+    base : ∀ {s₂ p}          → Transition s₁ p   [> s₂ , nothing <] → Transition* s₁ p s₂
