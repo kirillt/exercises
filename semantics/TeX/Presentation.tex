@@ -1,0 +1,84 @@
+\documentclass[12pt,pdf,hyperref={unicode}]{beamer}
+\usepackage[english,russian]{babel}
+\usepackage[utf8]{inputenc}
+\usetheme{Boadilla}
+
+   \begin{document}
+
+      \title[Proof assistants и семантики]{Использование proof assistants для описания операционных семантик}
+      \author[Кирилл Таран]{Кирилл Таран\newlineнауч. рук.: Булычев Д.Ю.}
+      \institute{445 группа}
+
+      \frame{\titlepage}
+
+      \section{О проекте}
+      \begin{frame}
+         \frametitle{О проекте}
+         \begin{itemize}
+            \item Исследование в рамках лаборатории JetBrains
+            \item Области исследования:
+               \begin{itemize}
+                  \item разработка языков программирования
+                  \item сертификационное программирование
+                     \begin{itemize}
+                     \item К программе прилагаются ``сертификаты'' -- формальные описания
+                      и доказательства её полезных свойств.
+                     \end{itemize}
+               \end{itemize}
+         \end{itemize}
+      \end{frame}
+
+      % Сначала расскажу о самой технологии, а потом только раскрою цель работы.
+
+      \section{Proof assistants}
+      \begin{frame}
+         \frametitle{Proof assistants}
+         \begin{itemize}
+            \item Сертификационное программирование появилось
+            в связи с развитием т.н. proof assistants -- систем
+            для интерактивного построения доказательств теорем,
+            автоматической проверки доказательств и т.д.
+            \item В данной работе рассмотрены системы,
+            основанные на зависимых типах
+         \end{itemize}
+      \end{frame}
+
+      \begin{frame}
+         \frametitle{Зависимые типы}
+         \begin{itemize}
+            \item ``Зависимые типы'' -- могут быть параметризованы термами (значениями),
+             в отличие от простых полиморфных типов, которые могут быть
+             параметризованы только другими типами
+            \item Язык программирования с зависимыми типами позволяет работать
+             с теоремами (Curry--Howard correspondence):
+               \begin{itemize}
+                  \item формулировка теоремы -- тип функции
+                  \item терм, определяющий функцию -- доказательство
+               \end{itemize}
+         \end{itemize}
+      \end{frame}
+
+      \section{Цели работы}
+      \begin{frame}
+         \frametitle{Цели работы}
+         \begin{itemize}
+            \item Операционная семантика -- дедуктивная система, поэтому
+             системы доказательств теорем могут оказаться полезными при работе с ней
+            \item Цель курсовой -- оценить применимость p.a. к задачам разработки языков программирования
+            \item Предполагаемые результаты:
+            \begin{itemize}
+               \item автоматическая генерация интерпретатора по операционной семантике
+               \item доказательство каких-либо свойств об интерпретации (по возможности автоматическое)
+               \item рассмотреть различные системы (по возможности)
+            \end{itemize}
+         \end{itemize}
+      \end{frame}
+
+      \section{Операционные семантики}
+      \begin{frame}
+         \frametitle{Операционные семантики}
+         \begin{itemize}
+         \end{itemize}
+      \end{frame}
+
+  \end{document}
