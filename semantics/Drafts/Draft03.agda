@@ -99,29 +99,29 @@ module Draft03 where
       state   : State
       program : Maybe S
 
-  data Transition-SOS (s₁ : State) : S → Control → Set where
-    [skip]    :             Transition-SOS s₁   skip       [>            s₁ , nothing <]
-    [assign]  : ∀ {k v } → Transition-SOS s₁ (assign k v) [> (k , v) |> s₁ , nothing <]
-    [comp-j]  : ∀ {s₂ p₁ p₂ p₃} → Transition-SOS s₁       p₁     [> s₂ , just       p₃      <]
-                                   → Transition-SOS s₁ (comp p₁ p₂) [> s₂ , just (comp p₃ p₂) <]
-    [comp-n]  : ∀ {s₂ p₁ p₂    } → Transition-SOS s₁       p₁     [> s₂ , nothing <]
-                                   → Transition-SOS s₁ (comp p₁ p₂) [> s₂ , just p₂ <]
+  data Transition-SS (s₁ : State) : S → Control → Set where
+    [skip]    :             Transition-SS s₁   skip       [>            s₁ , nothing <]
+    [assign]  : ∀ {k v } → Transition-SS s₁ (assign k v) [> (k , v) |> s₁ , nothing <]
+    [comp-j]  : ∀ {s₂ p₁ p₂ p₃} → Transition-SS s₁       p₁     [> s₂ , just       p₃      <]
+                                   → Transition-SS s₁ (comp p₁ p₂) [> s₂ , just (comp p₃ p₂) <]
+    [comp-n]  : ∀ {s₂ p₁ p₂    } → Transition-SS s₁       p₁     [> s₂ , nothing <]
+                                   → Transition-SS s₁ (comp p₁ p₂) [> s₂ , just p₂ <]
     [if-t]    : ∀ (b : B) (p₁ p₂ : S) → isTrue (     s₁ << b >> )
-                                        → Transition-SOS   s₁ (branch b p₁ p₂) [> s₁ , just p₁ <]
+                                        → Transition-SS   s₁ (branch b p₁ p₂) [> s₁ , just p₁ <]
     [if-f]    : ∀ (b : B) (p₁ p₂ : S) → isTrue (not (s₁ << b >>))
-                                        → Transition-SOS   s₁ (branch b p₁ p₂) [> s₁ , just p₂ <]
+                                        → Transition-SS   s₁ (branch b p₁ p₂) [> s₁ , just p₂ <]
     [while-t] : ∀ (b : B) (p      : S) → isTrue (     s₁ << b >> )
-                                        → Transition-SOS s₁ (while b p) [> s₁ , just p <]
+                                        → Transition-SS s₁ (while b p) [> s₁ , just p <]
     [while-f] : ∀ (b : B) (p      : S) → isTrue (not (s₁ << b >>))
-                                       → Transition-SOS s₁ (while b p) [> s₁ , nothing <]
+                                       → Transition-SS s₁ (while b p) [> s₁ , nothing <]
 
-  record Interpretation-SOS (s₁ : State) (p : S) : Set where
+  record Interpretation-SS (s₁ : State) (p : S) : Set where
     constructor I_,_I
     field
       control    : Control
-      transition : Transition-SOS s₁ p control
+      transition : Transition-SS s₁ p control
 
-  interpret-sos : (s : State) → (p : S) → Interpretation-SOS s p
+  interpret-sos : (s : State) → (p : S) → Interpretation-SS s p
   interpret-sos s₁ (skip           ) = I [> s₁ , nothing <] , [skip] I
   interpret-sos s₁ (assign   k   v ) = I [> (k , v) |> s₁ , nothing <] , [assign] I
   interpret-sos s₁ (comp     p₁ p₂) with interpret-sos s₁ p₁
@@ -177,7 +177,7 @@ module Draft03 where
   open Control
 
   sos≡ns : (s : State) → (p : S) → ∀ {s-sos s-ns}
-    → (tr-sos : Transition-SOS s p [> s-sos , nothing <]) → (tr-ns : Transition-NS s p s-ns)
+    → (tr-sos : Transition-SS s p [> s-sos , nothing <]) → (tr-ns : Transition-NS s p s-ns)
     → s-sos ≡ s-ns
   sos≡ns .s-ns .skip {.s-ns} {s-ns} [skip] [skip] = refl
   sos≡ns s .(assign k v) ([assign] {k} {v}) [assign] = refl
