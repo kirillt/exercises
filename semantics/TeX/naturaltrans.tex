@@ -1,0 +1,29 @@
+\begin{code}
+\>[2]\AgdaKeyword{data} \AgdaDatatype{Transition} \AgdaSymbol{(}\AgdaBound{s₁} \AgdaSymbol{:} \AgdaFunction{State}\AgdaSymbol{)} \AgdaSymbol{:} \AgdaDatatype{S} \AgdaSymbol{→} \AgdaFunction{State} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{[skip]} \<[13]%
+\>[13]\AgdaSymbol{:} \<[27]%
+\>[27]\AgdaDatatype{Transition} \AgdaBound{s₁} \<[43]%
+\>[43]\AgdaInductiveConstructor{skip} \<[76]%
+\>[76]\AgdaBound{s₁}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{[assign]}\AgdaIndent{3}{} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{k} \AgdaBound{v} \AgdaSymbol{\}} \AgdaSymbol{→} \AgdaDatatype{Transition} \AgdaBound{s₁} \AgdaSymbol{(}\AgdaInductiveConstructor{assign} \AgdaBound{k} \AgdaBound{v}\AgdaSymbol{)} \AgdaSymbol{((}\AgdaBound{k} \AgdaInductiveConstructor{,} \AgdaBound{s₁} \AgdaFunction{[[} \AgdaBound{v} \AgdaFunction{]]}\AgdaSymbol{)} \AgdaFunction{|>} \AgdaBound{s₁}\AgdaSymbol{)}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{[comp]} \<[13]%
+\>[13]\AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₂} \AgdaBound{s₃} \AgdaBound{p₁} \AgdaBound{p₂}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaDatatype{Transition} \AgdaBound{s₁} \<[53]%
+\>[53]\AgdaBound{p₁} \<[60]%
+\>[60]\AgdaBound{s₂}\<%
+\\
+\>[4]\AgdaIndent{34}{}\<[34]%
+\>[34]\hspace{33mm}\AgdaSymbol{→} \AgdaDatatype{Transition} \AgdaBound{s₂} \<[56]%
+\>[56]\AgdaBound{p₂} \<[63]%
+\>[63]\AgdaBound{s₃}\<%
+\\
+\>[4]\AgdaIndent{33}{}\<[34]%
+\>[34]\hspace{33mm}\AgdaSymbol{→} \AgdaDatatype{Transition} \AgdaBound{s₁} \AgdaSymbol{(}\AgdaInductiveConstructor{comp} \AgdaBound{p₁} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{s₃}\<%
+\\
+\>[2]\AgdaComment{-\-- et cetera ...}\<%
+\end{code}

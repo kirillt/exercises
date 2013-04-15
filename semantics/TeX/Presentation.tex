@@ -1,17 +1,26 @@
-\documentclass[12pt,pdf,hyperref={unicode}]{beamer}
+\documentclass[10pt,pdf,hyperref={unicode}]{beamer}
 \usepackage[english,russian]{babel}
-\usepackage[utf8]{inputenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{agda}
+\usepackage{ucs}
+
 \usetheme{Boadilla}
 
    \begin{document}
 
       \title[Proof assistants и семантики]{Использование proof assistants для описания операционных семантик}
-      \author[Кирилл Таран]{Кирилл Таран\newlineнауч. рук.: Булычев Д.Ю.}
+      \author[Кирилл Таран]{Кирилл Таран}
       \institute{445 группа}
 
-      \frame{\titlepage}
+      \begin{frame}
+         \titlepage
+         \hfill науч. рук.: Булычев Д.Ю.
+      \end{frame}
 
       \section{О проекте}
+
       \begin{frame}
          \frametitle{О проекте}
          \begin{itemize}
@@ -28,11 +37,11 @@
          \end{itemize}
       \end{frame}
 
-      % Сначала расскажу о самой технологии, а потом только раскрою цель работы.
+      \section{Введение в Proof assistants}
 
-      \section{Proof assistants}
       \begin{frame}
-         \frametitle{Proof assistants}
+         \frametitle{Введение}
+         \framesubtitle{Proof assistants}
          \begin{itemize}
             \item Сертификационное программирование появилось
             в связи с развитием т.н. proof assistants -- систем
@@ -44,7 +53,8 @@
       \end{frame}
 
       \begin{frame}
-         \frametitle{Зависимые типы}
+         \frametitle{Введение}
+         \framesubtitle{Зависимые типы}
          \begin{itemize}
             \item ``Зависимые типы'' -- могут быть параметризованы термами (значениями),
              в отличие от простых полиморфных типов, которые могут быть
@@ -59,11 +69,12 @@
       \end{frame}
 
       \section{Цели работы}
+
       \begin{frame}
          \frametitle{Цели работы}
          \begin{itemize}
             \item Операционная семантика -- дедуктивная система, поэтому
-             системы доказательств теорем могут оказаться полезными при работе с ней
+             инструменты для доказательства теорем могут оказаться полезными при работе с ней
             \item Цель курсовой -- оценить применимость p.a. к задачам разработки языков программирования
             \item Предполагаемые результаты:
             \begin{itemize}
@@ -74,11 +85,170 @@
          \end{itemize}
       \end{frame}
 
-      \section{Операционные семантики}
+      \section{Основная часть}
+
+      \newcommand{\control}[2]{\langle #1, #2 \rangle}
+      \newcommand{\rulens}[3]{\control{#1}{#2} \to #3}
+      \newcommand{\ruless}[4]{\rulens{#1}{#2}{#3} \frac{#4}{}}
+      \newcommand{\tree}[3]{\cfrac{#1 \hspace{10mm} #2}{#3}}
+
       \begin{frame}
          \frametitle{Операционные семантики}
+         \framesubtitle{Семантическое дерево}
          \begin{itemize}
+            \item Семантика задаёт переходы между состояниями
+            \item Программе соответствует семантическое дерево --
+             дерево применений правил семантики к синтаксическим
+             элементам программы
+             \item Пример дерева:
+             \begin{itemize}
+                \item[] программа `(z:=x ; x:=y) ; y:=z'
+                \newline
+                \item[] $\tree{\tree{\rulens{z:=x}{s_0}{s_1}}
+                                    {\rulens{x:=y}{s_1}{s_2}}
+                                    {\rulens{z:=x;x:=y}{s_0}{s_2}}}
+                              {\rulens{y:= z}{s_2}{s_3}}
+                              {\rulens{(z:=x ; x:=y) ; y:=z}{s_0}{s_3}}$
+                \newline
+                \item[] $s_0$, $s_1$, $s_2$ -- состояния программы (списки значений)
+             \end{itemize}
          \end{itemize}
+      \end{frame}
+
+
+      \newcommand{\seqns}[0]{\tree{\rulens{p_1}{s_0}{s_1}}{\rulens{p_2}{s_1}{s_2}}{\rulens{p_1 ; p_2}{s_0}{s_2}}}
+      \newcommand{\iftruens}[0]{s_0[b] = true\Rightarrow\tree{\rulens{p_1}{s_0}{s_1}}{}
+                                                             {\rulens{\mbox{if b then $p_1$ else $p_2$}}{s_0}{s_1}}}
+      \newcommand{\assignns}[0]{\rulens{x:=a}{s}{s[x \mapsto a]}}
+
+
+      \begin{frame}
+         \frametitle{Операционные семантики}
+         \framesubtitle{Правила вывода (big-step/natural semantics)}
+
+         \begin{align*}
+            \begin{tabular}{l || r}
+               ``;''       & $\seqns$    \\
+               \\ \hline \\
+               ``if-true'' & $\iftruens$ \\
+               \\ \hline \\
+               ``:=''      & $\assignns$ \\
+            \end{tabular}
+         \end{align*}
+      \end{frame}
+
+      \begin{frame}
+         \frametitle{Операционная семантика на Agda}
+         \framesubtitle{Тип данных}
+         \begin{itemize}
+            \item Семантика представляется на языке Agda в виде типа данных:
+            \begin{itemize}
+               \item Термы типа -- семантические деревья
+               \item Параметры типа -- входные/выходные состояния перехода и программа
+               \item Конструкторы -- правила перехода
+            \end{itemize}
+            \item[] \small{\input{naturaltrans}}
+         \end{itemize}
+      \end{frame}
+
+      \begin{frame}
+         \frametitle{Операционная семантика на Agda}
+         \framesubtitle{Тип данных}
+         \begin{itemize}
+            \item Преимущества подобного представления:
+            \begin{itemize}
+               \item Задаёт отношение ``вычислимости'', которое можно использовать в типах функций
+               \item Кроме результата вычисления интерпретатор будет строить дерево вычисления,
+                     которое можно использовать для анализа интерпретатора
+               \item Интерпретатор можно попытаться вывести автоматически
+            \end{itemize}
+            \item[] \small{\input{naturaltrans}}
+         \end{itemize}
+      \end{frame}
+
+      \begin{frame}
+         \frametitle{Операционная семантика на Agda}
+         \framesubtitle{Интерактивное построение интерпретатора}
+            \begin{itemize}
+               \item Код, введённый вручную:
+               \item[] \footnotesize{\input{naturalinterp}}
+            \end{itemize} %hack
+            \begin{itemize}
+               \item Сгенерированный код:
+               \item[] \footnotesize{\input{naturalinterpfull}}
+            \end{itemize}
+      \end{frame}
+
+      \begin{frame}
+         \frametitle{Операционная семантика на Agda}
+         \framesubtitle{Интерактивное построение интерпретатора}
+            \begin{itemize}
+               \item Автоматический вывод термов решается с помощью Agsy --
+                компонента Agda для поиска type inhabitant (auto proof search)
+               \item Agsy пытается разобрать по случаям аргументы функции и применить
+                данные ему подсказки (леммы), при этом проверяя типизируемость генерируемого выражения
+               \item К сожалению, есть ограничения реализации:
+                  \begin{itemize}
+                     \item сопоставление с образцом произвольных подвыражений
+                      Agsy выводить не умеет -- пока что приходится писать вручную
+                     \item но возможно получится обойтись функциями специального вида
+                      для разбора случаев
+                  \end{itemize}
+            \end{itemize}
+      \end{frame}
+
+      \newcommand{\seqssn}[0]{\tree{\rulens{p_1}{s_0}{s_1}}{}{\ruless{p_1 ; p_2}{s_0}{s_1}{p_2}}}
+      \newcommand{\seqssj}[0]{\tree{\ruless{p_1}{s_0}{s_1}{p_1'}}{}
+                                   {\ruless{p_1 ; p_2}{s_0}{s_1}{p_1' ; p_2}}}
+      \newcommand{\iftruess}[0]{s[b] = true\Rightarrow\ruless{\mbox{if b then $p_1$ else $p_2$}}{s}{s}{p_1}}
+
+      \begin{frame}
+         \frametitle{Операционные семантики}
+         \framesubtitle{Правила вывода (small-step/structural semantics)}
+
+         \begin{align*}
+            \begin{tabular}{c || c}
+               ``;''       & \begin{tabular}{c}
+                                $\seqssn$ \\
+                                \\
+                                $\seqssj$
+                             \end{tabular} \\
+               \\ \hline \\
+               ``if-true'' & $\iftruess$ \\
+               \\ \hline \\
+               ``:=''      & $\assignns$ \\
+            \end{tabular}
+         \end{align*}
+      \end{frame}
+
+      \begin{frame}
+         \frametitle{Операционная семантика на Agda}
+         \framesubtitle{Интерактивное доказательство свойств}
+            \begin{itemize}
+               \item Теорема об эквивалентности big-step и small-step семантик:
+               \item[] \small{\input{equivalence}}
+               \item Кода в доказательстве очень много, без автоматического вывода тяжело
+            \end{itemize}
+      \end{frame}
+
+      \section{Результаты}
+
+      \begin{frame}
+          \frametitle{Результаты}
+          \begin{itemize}
+             \item Найден способ полуавтоматического построения интерпретатора и доказательств свойств о нём
+             \item Есть возможность дополнить существующие инструменты до полной автоматизации
+             \item Были также рассмотрены Coq и Idris, использующие тактики вместо auto proof search
+                \begin{itemize}
+                   \item[] $\oplus$  тактики дают больше возможностей по управлению выводом
+                   \item[] $\ominus$ но требуют работы по написанию proof script
+                \end{itemize}
+             \item Репозиторий с кодом:
+                \begin{itemize}
+                   \item https://github.com/kirillt/exercises/tree/master/semantics
+                   \item[] (наброски семантик на Coq, Agda, Idris + интерпретатор на Agda)
+                \end{itemize}
+          \end{itemize}
       \end{frame}
 
   \end{document}

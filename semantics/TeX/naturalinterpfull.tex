@@ -1,0 +1,29 @@
+\begin{code}\>\<%
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaComment{-\-- Interpretation $s_1$ p = ($s_2$ : State, Transition $s_1$ p $s_2$)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{interpret} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{s} \AgdaSymbol{:} \AgdaFunction{State}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{S}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaRecord{Interpretation} \AgdaBound{s} \AgdaBound{p}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{interpret} \AgdaBound{s₁} \AgdaSymbol{(}\AgdaInductiveConstructor{skip} \<[31]%
+\>[31]\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{I} \AgdaBound{s₁} \AgdaInductiveConstructor{,} \AgdaInductiveConstructor{[skip]} \AgdaInductiveConstructor{I}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{interpret} \AgdaBound{s₁} \AgdaSymbol{(}\AgdaInductiveConstructor{assign} \<[25]%
+\>[25]\AgdaBound{k} \<[29]%
+\>[29]\AgdaBound{v} \AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{I} \AgdaSymbol{(}\AgdaBound{k} \AgdaInductiveConstructor{,} \AgdaSymbol{(}\AgdaBound{s₁} \AgdaFunction{[[} \AgdaBound{v} \AgdaFunction{]]}\AgdaSymbol{))} \AgdaFunction{|>} \AgdaBound{s₁} \AgdaInductiveConstructor{,} \AgdaInductiveConstructor{[assign]} \AgdaInductiveConstructor{I}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{interpret} \AgdaBound{s₁} \AgdaSymbol{(}\AgdaInductiveConstructor{comp} \<[25]%
+\>[25]\AgdaBound{p₁} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaKeyword{with} \AgdaFunction{interpret} \AgdaBound{s₁} \AgdaBound{p₁}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{I} \AgdaBound{s₂} \AgdaInductiveConstructor{,} \AgdaBound{tr₁} \AgdaInductiveConstructor{I} \AgdaKeyword{with} \AgdaFunction{interpret} \AgdaBound{s₂} \AgdaBound{p₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{I} \AgdaBound{s₃} \AgdaInductiveConstructor{,} \AgdaBound{tr₂} \AgdaInductiveConstructor{I} \AgdaSymbol{=} \AgdaInductiveConstructor{I} \AgdaBound{s₃} \AgdaInductiveConstructor{,} \AgdaInductiveConstructor{[comp]} \AgdaBound{tr₁} \AgdaBound{tr₂} \AgdaInductiveConstructor{I}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaComment{-\-- et cetera ...}\<%
+\<\end{code}
