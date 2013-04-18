@@ -7,3 +7,4 @@ rm *.snm
 rm *.toc
 rm *.dvi
 rm *.pdf
+rm *.ptb
