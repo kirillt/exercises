@@ -53,7 +53,3 @@ module Evaluation where
   s << eq    x y >> with ((s [[ x ]]) ≡? (s [[ y ]]))
   ... | yes _ = true
   ... | no  _ = false
-
---  dec2bool : ∀ {a l} → {A : Set a} → {_<*>_ : Rel A l} → ∀ {x y} → Dec (x <*> y) → Bool
---  dec2bool (yes _) = true
---  dec2bool (no  _) = false
