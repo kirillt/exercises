@@ -1,2 +1,2 @@
 #!/bin/sh
-latex -output-format=pdf $@
+latex -output-format=pdf $@ && gs2jpg *.pdf
