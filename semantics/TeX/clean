@@ -8,3 +8,6 @@ rm *.toc
 rm *.dvi
 rm *.pdf
 rm *.ptb
+rm *.bbl
+rm *.blg
+rm -rf output
