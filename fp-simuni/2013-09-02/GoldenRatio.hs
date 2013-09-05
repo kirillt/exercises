@@ -6,8 +6,8 @@ f = tailrecursive
 naive 0 = 1
 naive n = 1 + (1 / (naive $ n - 1))
 
--- Gives stack overflow on high parameters
--- to change it run compiled program with "+RTS -K<size> -RTS" arguments
+-- Gives stack overflow on high parameters;
+-- to change it run compiled program with "+RTS -K<size> -RTS" arguments.
 
 -- > time ./GoldenRatio
 --    real	0m3.589s
@@ -21,6 +21,7 @@ naive n = 1 + (1 / (naive $ n - 1))
 -- with -O3:
 --    total time  =        0.33 secs   (327 ticks @ 1000 us, 1 processor)
 --    total alloc =   8,075,836 bytes  (excludes profiling overheads)
+
 
 tailrecursive n = run 1 n
     where

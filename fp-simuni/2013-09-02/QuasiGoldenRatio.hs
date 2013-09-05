@@ -21,6 +21,7 @@ tailrecursive n = run n n
 --    total time  =        0.18 secs   (177 ticks @ 1000 us, 1 processor)
 --    total alloc =      75,612 bytes  (excludes profiling overheads)
 
+
 combinators n = foldl' cons n $! reverse [1..n]
     where
         cons acc n = (n - 1) + (1 / acc)
