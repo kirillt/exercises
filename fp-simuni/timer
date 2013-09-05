@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # $1 is name of the program
-# $2 is compiler option
+# $2 is number of repeats for timer
+# $3 is compiler options to compare
+# $4 is compiler option
 
 log=.timer.log
 
@@ -46,11 +48,14 @@ cycle() {
     showprof $1
 }
 wrappedcycle() {
-    comment "$(tablines "$(cycle $1 $2 $3)")"
+    comment "$(tablines "$(cycle $1 $2 $4)")"
 }
 
-echo "-- without optimization:"
-wrappedcycle $1 $2 $3
+echo "-- without options:"
+wrappedcycle $1 $2 $4
 
-echo "-- with -O3:"
-wrappedcycle $1 $2 "-O3 $3"
+for option in $3
+ do
+    echo "-- with $option:"
+    wrappedcycle $1 $2 $3 "$option $4"
+ done
