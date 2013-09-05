@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# $1 is name of the program
+# $2 is compiler option
+
+log=.timer.log
+
+tablines() {
+    OIFS=$IFS
+    IFS=$'\n'
+    for line in $1
+    do
+        echo "    $line"
+    done
+    IFS=$OIFS
+}
+comment() {
+    OIFS=$IFS
+    IFS=$'\n'
+    for line in $1
+    do
+        echo "-- $line"
+    done
+    IFS=$OIFS
+}
+
+run() {
+    ./$1 +RTS -p -RTS &>> $log
+}
+clean() {
+    (rm $1 ; rm $1.o ; rm $1.prof) &>> $log
+}
+timer() {
+    echo "time of $2 launches:"
+    tablines "$(`find ../../.. -path "*exercises/timer"` ./$1 $2)"
+}
+showprof() {
+    echo "profiling:"
+    tablines "$(grep total $1.prof | sed 's/^[[:space:]]*//g')"
+}
+cycle() {
+    clean $1
+    ghc -prof -o $1 $3 $1.hs &>> $log
+    timer $1 $2
+    run      $1 
+    showprof $1
+}
+wrappedcycle() {
+    comment "$(tablines "$(cycle $1 $2 $3)")"
+}
+
+echo "-- without optimization:"
+wrappedcycle $1 $2 $3
+
+echo "-- with -O3:"
+wrappedcycle $1 $2 "-O3 $3"
