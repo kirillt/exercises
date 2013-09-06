@@ -30,7 +30,7 @@ run() {
     ./$1 +RTS -p -RTS &>> $log
 }
 clean() {
-    (rm $1 ; rm $1.o ; rm $1.prof) &>> $log
+    rm $1 $1.o $1.prof &>> $log
 }
 timer() {
     echo "time of $2 launches:"
