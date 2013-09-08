@@ -34,7 +34,7 @@ clean() {
 }
 timer() {
     echo "time of $2 launches:"
-    tablines "$(`find ../../.. -path "*exercises/timer"` ./$1 $2)"
+    tablines "$(`find ../../../.. -path "*exercises/timer"` ./$1 $2)"
 }
 showprof() {
     echo "profiling:"
