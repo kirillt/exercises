@@ -21,6 +21,10 @@ public class SinglePtrList<T> {
             }
         }
 
+        public String toString() {
+            return "{" + value + "->" + (next == null ? "null" : next) + "}";
+        }
+
         public final T value;
         private Node<T> next;
     }
@@ -64,6 +68,28 @@ public class SinglePtrList<T> {
             }
         }
         nodes.right.next = null;
+        return this;
+    }
+
+    public String toString() {
+        return begin.toString();
+    }
+
+    // common interview problem
+    public SinglePtrList<T> reverse() {
+        if (begin == null) {
+            return this;
+        }
+        this.end = this.begin;
+        Node<T> curr = this.begin;
+        Node<T> prev = null;
+        while (curr != null) {
+            Node<T> next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        this.begin = prev;
         return this;
     }
 
