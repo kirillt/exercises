@@ -2,7 +2,7 @@ package structures;
 
 import exceptions.NoSuchElement;
 
-public class SinglePtrList<T> {
+public class SinglePtrList<T> implements ListIface<T> {
     class Node<T> {
         Node(final T value) {
             this.value = value;
@@ -72,7 +72,7 @@ public class SinglePtrList<T> {
     }
 
     public String toString() {
-        return begin.toString();
+        return begin != null ? begin.toString() : "null";
     }
 
     // common interview problem
