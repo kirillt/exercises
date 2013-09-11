@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import algorithms.HeapSort;
 import algorithms.MergeSort;
 import algorithms.ComparisonSortIface;
 
@@ -13,6 +14,7 @@ public class ComparisonSortsTest {
     private List<ComparisonSortIface<Integer>> getAllSorts() {
         List<ComparisonSortIface<Integer>> sorts = new LinkedList<ComparisonSortIface<Integer>>();
         sorts.add(new MergeSort());
+        sorts.add(new HeapSort());
         return sorts;
     }
 
