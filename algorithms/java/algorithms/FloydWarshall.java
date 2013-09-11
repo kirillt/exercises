@@ -6,8 +6,6 @@ import algorithms.DistancesSearchIface.Distance;
 import static algorithms.DistancesSearchIface.Distance.d;
 import static algorithms.DistancesSearchIface.Distance.inf;
 
-import java.lang.System;
-
 public class FloydWarshall implements DistancesSearchIface {
     public void findAllDistances(final Distance[][] graph) {
         final int n = graph.length;

@@ -8,6 +8,7 @@ import java.util.*;
 import algorithms.DistancesSearchIface;
 import algorithms.DistancesSearchIface.Distance;
 
+import algorithms.Dijkstra;
 import algorithms.FloydWarshall;
 
 import static algorithms.DistancesSearchIface.Distance.d;
@@ -19,6 +20,7 @@ public class DistancesSearchTest {
     private List<DistancesSearchIface> getAllAlgorithms() {
         List<DistancesSearchIface> algorithms = new LinkedList<DistancesSearchIface>();
         algorithms.add(new FloydWarshall());
+        algorithms.add(new Dijkstra());
         return algorithms;
     }
 
