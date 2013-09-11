@@ -4,8 +4,6 @@ import algorithms.ComparisonSortIface;
 
 import java.util.Arrays;
 
-import java.lang.StringBuilder;
-
 public class HeapSort<T extends Comparable> implements ComparisonSortIface<T> {
     public  void sort(T[] array) {
         final int size = array.length;
@@ -14,7 +12,6 @@ public class HeapSort<T extends Comparable> implements ComparisonSortIface<T> {
         }
         build(array, size);
         sort(array, size);
-
     }
     private void fixheap(T[] array, final int i, final int n) {
         int p = i;                 // p stands for "parent"
