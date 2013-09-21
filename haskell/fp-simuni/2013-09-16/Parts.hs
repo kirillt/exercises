@@ -25,7 +25,7 @@ parts2 xs =
        else work (n `div` 2) 0 [] [] xs
            where
                 check :: Ord a => (a -> a -> Bool) -> [a] -> Bool
-                check f xs@(x:xt) = and $ map (uncurry f) $ zip xs $ xt
+                check f xs@(x:xt) = and $ zipWith f xs xt
                 check _       []  = True
 
                 work k = work'
