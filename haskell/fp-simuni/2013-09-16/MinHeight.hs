@@ -4,13 +4,15 @@ import Criterion.Main
 
 main =
     let
-        l = generate 10  0
-        h = generate 20  5
-        b = generate 20 10
+        left_only = generate 130000  0
+        left_12x  = generate     38  3
+        left_3x   = generate     18  5
+        both      = generate      9  9
     in defaultMain [
-      bench "naive (both, 10 & 10)" $ whnf (normalize . naive) b
-    , bench "naive (both, 10 &  5)" $ whnf (normalize . naive) h
-    , bench "naive (both, 10 &  0)" $ whnf (normalize . naive) l
+      bench "naive (130000 / 0)" $ whnf (normalize . naive) left_only
+    , bench "naive (    38 / 3)" $ whnf (normalize . naive) left_12x
+    , bench "naive (    15 / 5)" $ whnf (normalize . naive) left_3x
+    , bench "naive (     9 / 9)" $ whnf (normalize . naive) both
     ]
 
 generate  0  0 = Empty
