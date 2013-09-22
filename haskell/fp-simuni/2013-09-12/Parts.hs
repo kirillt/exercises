@@ -30,6 +30,12 @@ parts2 xs =
 
                 work k = work'
                     where
-                        work' l ls rs (y:ys) = work' (l + 1) (y:ls) rs ys || work' l ls (y:rs) ys
                         work' l ls rs    []  | l == k = check (>) ls && check (>) rs
+                        work' l _  _      _  | l == k = False
+                        work' l ls rs (y:ys) =
+                            (y `ok` ls && work' (l + 1) (y:ls)   rs  ys) ||
+                            (y `ok` rs && work'  l         ls (y:rs) ys)
+                            where
+                                ok _   []  = True
+                                ok y (h:_) = y > h
                         work' _ _  _     _   = False
