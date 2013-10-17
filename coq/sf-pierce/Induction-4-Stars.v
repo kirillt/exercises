@@ -1,3 +1,4 @@
+(* First attempt. *)
 Theorem plus_swap :
   forall n m p : nat, n + (m + p) = m + (n + p).
 Proof.
@@ -27,6 +28,23 @@ Proof.
   rewrite A.
   rewrite C.
   reflexivity.
+Qed.
+
+(* Second attempt. *)
+Theorem plus_swap' :
+  forall n m p : nat, n + (m + p) = m + (n + p).
+Proof.
+  intros n m p.
+  induction n.
+    reflexivity.
+    simpl; rewrite IHn. 
+    assert (T : forall x y : nat, S (x + y) = x + S y).
+      intros x y.
+      induction x.
+        reflexivity.
+        simpl; rewrite IHx; reflexivity.
+    rewrite T.
+    reflexivity.
 Qed.
 
 Theorem mult_is_sum :
