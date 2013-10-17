@@ -7,7 +7,7 @@ Definition inc (b : binary) : binary :=
   match b with
   | Zero            => Succ Zero
   | Succ Zero       => Twice (Succ  Zero)
-  | Succ (Succ  b') => Succ  (Twice (Succ  b'))
+  | Succ (Succ  b') => Succ  (Succ  (Succ  b'))
   | Succ (Twice b') => Twice (Succ  b')
   | Twice b'        => Succ  (Twice b')
   end.
@@ -15,8 +15,8 @@ Definition inc (b : binary) : binary :=
 Fixpoint toUnary (b : binary) : nat :=
   match b with
   | Zero     => O
-  | Succ  b' => 1 + (toUnary b')
-  | Twice b' => 2 * (toUnary b')
+  | Succ  b' => S (toUnary b')
+  | Twice b' =>   (toUnary b') + (toUnary b')
   end.
 
 Fixpoint fromUnary (n : nat) : binary :=
@@ -25,8 +25,30 @@ Fixpoint fromUnary (n : nat) : binary :=
   | S n' => inc (fromUnary n')
   end.
 
+Theorem toUnary_commutes_with_inc :
+  forall b : binary, 1 + (toUnary b) = toUnary (inc b).
+Proof.
+  intro b.
+  induction b.
+    reflexivity.
+    induction b.
+      simpl; reflexivity.
+      simpl; reflexivity.
+      simpl. assert (T : forall x y : nat, S (x + y) = x + S y).
+        intros x y.
+        induction x.
+          reflexivity.
+          simpl; rewrite IHx; simpl; reflexivity.
+      rewrite T.
+      reflexivity.
+    simpl; reflexivity.
+Qed.
+          
 Theorem toUnary_is_fromUnary_inverse :
   forall n : nat, toUnary (fromUnary n) = n.
-  
-Theorem fromUnary_is_toUnary_inverse :
-  forall b : binary, fromUnary (toUnary b) = b.
+Proof.
+  intro n.
+  induction n.
+    reflexivity.
+    simpl; rewrite <- toUnary_commutes_with_inc; simpl; rewrite IHn; reflexivity.
+Qed.
