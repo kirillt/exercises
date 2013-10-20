@@ -50,37 +50,51 @@ Proof.
     reflexivity.
 Qed.
 
-Theorem reverse_is_injective :
+Lemma equal_reverses_have_equal_lengths :
+  forall xs ys : natlist, reverse xs = reverse ys -> length xs = length ys.
+Proof.
+  intros xs ys R.
+  rewrite reverse_preserves_length.
+  replace (length ys) with (length (reverse ys)).
+  rewrite R.
+  reflexivity.
+  rewrite <- reverse_preserves_length.
+  reflexivity.
+Qed.
+
+Lemma snoc_increases_length :
+  forall (x : nat) (xs : natlist), length (snoc x xs) = S (length xs).
+Proof.
+  intros x xs.
+  induction xs as [ | x' xs' ].
+    reflexivity.
+    simpl; rewrite IHxs'; reflexivity.
+Qed.
+      
+Lemma snoc_injective :
+  forall (x y : nat) (xs ys : natlist), snoc x xs = snoc y ys -> x :: xs = y :: ys.
+Proof.
+  intros x y xs.
+  induction xs as [ | x' xs' ].
+    intros ys.
+    induction ys as [ | y' ys' ].
+      intros eq; simpl in eq. apply eq.
+      intros eq; simpl in eq; apply f_equal with (f := length) in eq; simpl in eq; rewrite snoc_increases_length in eq; discriminate.
+    induction ys as [ | y' ys' ].
+      intros eq; simpl in eq; apply f_equal with (f := length) in eq; simpl in eq; rewrite snoc_increases_length in eq; discriminate.
+      intros eq; simpl in eq; inversion eq; apply IHxs' in H1; inversion H1; reflexivity.
+Qed.
+      
+Theorem reverse_injective :
   forall xs ys : natlist, reverse xs = reverse ys -> xs = ys.
 Proof.
-  intros xs ys.
-  intro R.
-  assert (L : length xs = length ys).
-    rewrite reverse_preserves_length.
-    replace (length ys) with (length (reverse ys)).
-    rewrite R.
-    reflexivity.
-    rewrite <- reverse_preserves_length.
-    reflexivity.
-(* possible way -- induction by length of lists *)
-(*
-  assert (W : forall n : nat, length xs = n -> length ys = n -> xs = ys).
-    intro n.
-    induction n as [ | n' ].
-      induction xs as [ | x xs' ]; induction ys as [ | y ys' ]. reflexivity. discriminate. discriminate. discriminate.
-      induction xs as [ | x xs' ]; induction ys as [ | y ys' ]. discriminate. discriminate. discriminate.
-        simpl. admit.
-  elim W with (length xs).
-  reflexivity.
-  reflexivity.
-  rewrite L; reflexivity.
-*)
-  destruct xs as [ | x xs' ].
+  intro xs.
+  induction xs as [ | x xs' ].
+    intros ys.
     destruct ys as [ | y ys' ].
       reflexivity.
-      simpl in L. discriminate.
-    destruct ys as [ | y ys' ].
-      simpl in L. discriminate.
-      assert (x = y).
-        simpl in R.
-(* ? *)
+      intro R; apply equal_reverses_have_equal_lengths in R; discriminate.
+    induction ys as [ | y ys' ].
+      intro R; apply equal_reverses_have_equal_lengths in R; discriminate.
+      intro R; simpl in R; apply snoc_injective in R; inversion R; apply IHxs' in H1; rewrite H1; reflexivity.
+Qed.
