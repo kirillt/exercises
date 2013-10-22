@@ -84,3 +84,64 @@ Proof.
         rewrite T; rewrite F; rewrite F; reflexivity.
         rewrite 3 F; reflexivity.
 Qed.
+
+Fixpoint beq_nat (n m : nat) : bool :=
+  match (n,m) with
+  | (O,O) => true
+  | (S n', S m') => beq_nat n' m'
+  | _ => false
+  end.
+
+Theorem beq_nat_sym :
+  forall n m, beq_nat n m = beq_nat m n.
+Proof.
+  intro n.
+  induction n.
+    intro m; induction m.
+      reflexivity.
+      reflexivity.
+    intro m; induction m.
+      reflexivity.
+      simpl; apply IHn.
+Qed.
+
+Theorem split_combine {X Y} :
+  forall (l : list (X * Y)) l1 l2, length l1 = length l2 -> combine l1 l2 = l -> split l = (l1,l2).
+Proof.
+  intros.
+  generalize dependent l.
+  generalize dependent l2.
+  induction l1.
+    destruct l2.
+      intros; simpl in H0; rewrite <- H0; compute; reflexivity.
+      intros; discriminate.
+    destruct l2.
+      intros; discriminate.
+      intros; simpl in H; simpl in H0; inversion H. destruct l.
+        discriminate.
+        inversion H0; rewrite H4; apply IHl1 in H4.
+        unfold split; unfold split in H4; simpl; simpl in H4; inversion H4.
+        rewrite H5; rewrite H6; reflexivity.
+        inversion H; reflexivity.
+Qed.
+
+Fixpoint filter {X} (p : X -> bool) (xs : list X) : list X :=
+  match xs with
+  | nil => nil
+  | cons x xs' => if p x
+                  then cons x (filter p xs')
+                  else (filter p xs')
+  end.
+
+Theorem filter_exercise {X} :
+  forall (p : X -> bool) (x : X) (xs xs' : list X), filter p xs = cons x xs' -> p x = true.
+Proof.
+  intros.
+  generalize dependent x.
+  generalize dependent xs'.
+  induction xs.
+    discriminate.
+    intros. destruct (p a) as [] _eqn:P.
+      simpl in H; rewrite P in H; inversion H; rewrite H1 in P; apply P.
+      simpl in H; rewrite P in H; apply IHxs with xs'; apply H.
+Qed.
