@@ -1,5 +1,6 @@
 Require Export List.
 Require Export Coq.Lists.List.
+Require Export Coq.Arith.Plus.
 
 Notation "[]" := nil.
 Notation "[ x ]" := (cons x nil).
@@ -35,22 +36,23 @@ Theorem reverse_equal_means_palindrom {X} :
   forall (xs : list X), rev xs = xs -> palindrom xs.
 Proof.
   intros xs R.
-  induction xs.
+  destruct xs as [ | h xs' ] _eqn:H.
     apply empty.
-    simpl in R. induction (rev xs).
-      simpl in R; inversion R; apply single.
-    admit.
-(* TODO *)
+    induction (xs', rev xs') as ([ | h' xs'' ],[ | t m ]) _eqn:I.
+      inversion I; simpl; apply single.
+      inversion I; apply single.
+      inversion I; simpl in H2.
+        assert (HL : length (rev xs'' ++ [h']) = length (@nil X)). rewrite H2; reflexivity.
+        rewrite app_length in HL; rewrite plus_comm in HL; simpl in HL; discriminate.
+      inversion I; simpl in H2.
+        assert (RM : rev m = m). admit.
+        assert (RS : [h'] = rev [h']). reflexivity.
+        rewrite <- RM in H2; rewrite <- rev_unit in H2; rewrite RS in H2; rewrite <- rev_app_distr in H2.
+        assert (H3 : [h'] ++ xs'' = m ++ [t]). admit. (* reverse_injective proved in other module *)
+        simpl in H3; rewrite H3.
 Qed.
 
 (* TODO (just for fun) *)
-
-Lemma reverse_middle {X} :
-  forall (x : X) (m : list X), rev (x :: m ++ [x]) = x :: m ++ [x] -> rev m = m.
-Proof.
-  intros x xs R.
-  admit.
-Qed.
 
 Fixpoint reverse_equal_means_palindrom {X} (xs : list X) (p : rev xs = xs) : palindrom xs :=
   match xs with
