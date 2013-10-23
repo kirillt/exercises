@@ -98,6 +98,3 @@ Proof.
       intro R; apply equal_reverses_have_equal_lengths in R; discriminate.
       intro R; simpl in R; apply snoc_injective in R; inversion R; apply IHxs' in H1; rewrite H1; reflexivity.
 Qed.
-
-(* Sergey Sinchuk's version *)
-
