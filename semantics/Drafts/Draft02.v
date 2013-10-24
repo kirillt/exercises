@@ -93,27 +93,11 @@ Record Interpretation (s : State) (p : ST) : Set := I
   {control    : Control;
    transition : Transition s p control}.
 
-Require Import CpdtTactics.
-
 Definition final (s : State) : Control := C s None.
 
-Definition interpret (p : ST) (s : State) : Interpretation s p.
+Theorem interpret : forall (p : ST) (s : State), Interpretation s p.
 Proof.
-
-  
-(*
-  induction p.
-  crush' final fail.
-  crush' TSkip fail.
-  crush' (I s skip i) fail.
-  induction IHp1.
-  induction control0.
-  induction program0.
-  Check TComp_s.
-  Check TComp_s s.
-  crush' (I s (comp p1 p2) (C state0 (Some (comp a p2))) (TComp_s s transition0)) fail.
-
-  match p with
-  | skip => I s skip (C s None) (TSkip s)
-  end.
-*)
+  intros p s.
+  induction p as [] _eqn:P.
+    exact (I s skip (C s None) (TSkip s)).
+(* TODO *) 
