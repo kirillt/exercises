@@ -92,3 +92,15 @@ Proof.
     assert (C : a :: yl = [] ++ [a] ++ yl). reflexivity. rewrite C; rewrite <- 2! app_assoc.
     assert (X : xs = )
 Qed.
+
+Thorem subseq_trans1 {X} :
+  forall xs ys zs, subsequence1 xs ys -> subsequence1 ys zs -> subsequence1 xs zs.
+Proof.
+(* TODO *) admit.
+Qed.
+
+Thorem subseq_trans2 {X} :
+  forall xs ys zs, subsequence2 xs ys -> subsequence2 ys zs -> subsequence2 xs zs.
+Proof.
+(* TODO *) admit.
+Qed.
