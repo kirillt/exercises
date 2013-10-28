@@ -187,3 +187,33 @@ Inductive Contrary {A B} : (A -> B) -> (B -> A) -> Prop :=
 Inductive Id {A} : (A -> A) -> Prop :=
   | identity    : Id id
   | composition : forall (B : Type) (f : B -> A) (g : A -> B), Contrary f g -> Id (compose f g).
+
+Definition combine_odd_even (Podd Peven : nat -> Prop) (n : nat) : Prop :=
+  (fix combine_odd_even' (Podd Peven : nat -> Prop) (n curr : nat) : Prop :=
+    match curr with
+    | O => Peven n
+    | S O => Podd n
+    | S (S curr') => combine_odd_even' Podd Peven n curr'
+    end) Podd Peven n n.
+
+Fixpoint evenb (n : nat) : bool :=
+  match n with
+  | O => true
+  | S n' => negb (evenb n')
+  end.
+
+Fixpoint oddb (n : nat) : bool :=
+  match n with
+  | O => false
+  | S n' => negb (oddb n')
+  end.
+
+Theorem combine_odd_even_intro :
+  forall (Podd Peven : nat -> Prop) (n : nat), (oddb n = true -> Podd n) -> (evenb n = true -> Peven n) -> combine_odd_even Podd Peven n.
+Proof.
+  intros Podd Peven n O E.
+  unfold combine_odd_even.
+  induction n.
+    simpl; apply E; reflexivity.
+(* TODO this and exercises after this *) admit.
+Qed.
