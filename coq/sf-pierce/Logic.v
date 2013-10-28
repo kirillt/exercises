@@ -308,3 +308,35 @@ Proof.
   rewrite <- E.
   apply F.
 Qed.
+
+Inductive all {X} (P : X -> Prop) : list X -> Prop :=
+  | all_nil  : all P nil
+  | all_cons : forall (x : X) (xs : list X), P x -> all P xs -> all P (cons x xs).
+
+Fixpoint allb {X} (p : X -> bool) (xs : list X) : bool :=
+  match xs with
+  | nil => true
+  | cons x xs' => if p x then allb p xs' else false
+  end.
+
+Theorem all_forallb {X} :
+  forall (p : X -> bool) (xs : list X), allb p xs = true <-> all (fun x => p x = true) xs.
+Proof.
+  intros p xs.
+  split.
+(* forward *)
+    intros B; induction xs.
+      apply all_nil.
+      simpl in B.
+      assert (p a = true).
+        destruct (p a). reflexivity. discriminate.
+      apply all_cons.
+        apply H.
+        rewrite H in B; simpl in B; apply IHxs; apply B.
+(* backward *)
+    intros P; induction xs.
+      reflexivity.
+      inversion P; simpl; rewrite H1; apply IHxs; apply H2.
+Qed.
+
+(* TODO exercise with filter of merge of two lists (4 stars) *)
