@@ -1,5 +1,49 @@
-(* TODO exercise with filter of merge of two lists (4 stars) *)
-(* TODO exercise with filter and subsequences (5 stars) *)
+Notation "[]" := nil.
+Notation "h :: t" := (cons h t).
+Notation "[ x ]" := (cons x nil).
+
+(* Filter of merge of two lists *)
+
+Fixpoint filter {X} (p : X -> bool) (xs : list X) : list X :=
+  match xs with
+  | nil => nil
+  | cons x xs' => if p x then cons x (filter p xs') else filter p xs'
+  end.
+
+Inductive merge {X} : list X -> list X -> list X -> Prop :=
+  | m_nil   :                                                       merge       []        []        []
+  | m_left  : forall (l : X) (ls rs xs : list X), merge ls rs xs -> merge (l :: ls)       rs  (l :: xs)
+  | m_right : forall (r : X) (ls rs xs : list X), merge ls rs xs -> merge       ls  (r :: rs) (r :: xs).
+
+Inductive all {X} (p : X -> bool) : list X -> Prop :=
+  | a_nil  : all p []
+  | a_cons : forall (x : X) (xs : list X), all p xs -> p x = true -> all p (x :: xs).
+
+Require Export Coq.Program.Basics.
+
+Lemma compose_negb_is_true {X} (p : X -> bool) :
+  forall (x : X), compose negb p x = true -> p x = false.
+Proof. intros x C; compute in C; destruct (p x). discriminate. reflexivity. Qed.
+
+Theorem merge_filter {X} (p : X -> bool) :
+  forall (ls rs xs : list X), all p ls -> all (compose negb p) rs -> merge ls rs xs -> filter p xs = ls.
+Proof.
+  intros ls.
+  induction ls.
+    intros rs; induction rs.
+      intros xs AL AR M; inversion M; reflexivity.
+      intros xs AL AR M; inversion M.
+        simpl; rewrite IHrs; inversion AR; compute in H7; apply compose_negb_is_true in H7.
+          rewrite H7; reflexivity. apply a_nil. apply H6. apply H3.
+    intros rs; induction rs.
+      intros xs AL AR M; inversion M.
+        inversion AL; simpl; rewrite H7; rewrite IHls with (rs:=[]). reflexivity. apply H6. apply AR. apply H3.
+      intros xs AL AR M; inversion M.      
+        inversion AL; simpl; rewrite H7; rewrite IHls with (rs:=a0 :: rs). reflexivity. apply H6. apply AR. apply H3.
+        inversion AR; simpl; apply compose_negb_is_true in H7; rewrite H7. apply IHrs. apply AL. apply H6. apply H3.
+Qed.
+        
+(* No repeats and disjoint *)
 
 Inductive appears_in {X} (x : X)  : list X -> Prop :=
   | ai_here  : forall xs, appears_in x (cons x xs)
@@ -86,4 +130,7 @@ Proof.
       inversion AXY.
       simpl in IHys; simpl in AXY; simpl. apply AOY in AXY. apply AXY.
     intros ys AOY D AXY.
-(* TODO *)
+(* TODO *) admit.
+
+(* TODO pigeonhole principle *)
+
