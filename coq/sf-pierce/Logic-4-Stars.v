@@ -133,4 +133,3 @@ Proof.
 (* TODO *) admit.
 
 (* TODO pigeonhole principle *)
-
