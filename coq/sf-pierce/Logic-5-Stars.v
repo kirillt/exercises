@@ -35,4 +35,4 @@ Proof.
   split.
     intros F.
       split.
-(* Emacs' undo is really strange :( *)
+(* TODO Emacs' undo is really strange :( *)

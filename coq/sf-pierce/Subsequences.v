@@ -14,18 +14,18 @@ Inductive subsequence2 {X} : list X -> list X -> Prop :=
   | addl    : forall (y : X) (xs yl yr : list X), subsequence2 xs yr -> subsequence2 ([y] ++ xs) (yl ++ [y] ++ yr)
   | addr    : forall (y : X) (xs yl yr : list X), subsequence2 xs yl -> subsequence2 (xs ++ [y]) (yl ++ [y] ++ yr).
 
-(* TODO seems to be wrong definitions, look at Logic-5-Stars for correct one (but SF talks about 3 constructors instead of 2) *)
+(* TODO seems to be wrong definitions *)
 
 Theorem equal_defs_l2r {X} :
   forall xs ys : list X, subsequence1 xs ys -> subsequence2 xs ys.
 Proof.
-(* TODO *) admit.
+  admit.
 Qed.
 
 Theorem equal_defs_r2l {X} :
   forall xs ys : list X, subsequence2 xs ys -> subsequence1 xs ys.
 Proof.
-(* TODO *) admit.
+  admit.
 Qed.
 
 Theorem subseq_refl1 {X} :
@@ -92,17 +92,17 @@ Proof.
   induction yl.
     simpl; apply S.
     assert (C : a :: yl = [] ++ [a] ++ yl). reflexivity. rewrite C; rewrite <- 2! app_assoc.
-(* TODO *) admit.
+  admit.
 Qed.
 
 Theorem subseq_trans1 {X} :
   forall (xs ys zs : list X), subsequence1 xs ys -> subsequence1 ys zs -> subsequence1 xs zs.
 Proof.
-(* TODO *) admit.
+ admit.
 Qed.
 
 Theorem subseq_trans2 {X} :
   forall (xs ys zs : list X), subsequence2 xs ys -> subsequence2 ys zs -> subsequence2 xs zs.
 Proof.
-(* TODO *) admit.
+ admit.
 Qed.
