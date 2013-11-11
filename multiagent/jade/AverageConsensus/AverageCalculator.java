@@ -8,9 +8,6 @@ import jade.lang.acl.UnreadableException;
 import java.io.Serializable;
 import java.io.IOException;
 
-//System.out.println(getLocalName() + " is ok!");
-//System.out.println("Topology of " + myAgent.getLocalName() + "\n" + unit);
-
 public class AverageCalculator extends Agent {
     public double number = 0;
     protected void setup() {
@@ -36,7 +33,7 @@ public class AverageCalculator extends Agent {
                 send(msg);
                 System.out.println("Average of "
                     + getLocalName() + "'s predecessors and itself is "
-                    + sum.average());
+                    + sum.average() + " (sum is " + sum + ")");
                 number = sum.average();
                 finished = true;
             }
