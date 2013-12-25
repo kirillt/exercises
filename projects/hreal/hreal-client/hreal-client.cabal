@@ -1,0 +1,28 @@
+Name:                hreal-client
+Version:             0.1
+Author:              Kirill Taran
+Maintainer:          kirill.t256@gmail.com
+
+Category:            Learning
+Build-type:          Simple
+
+Cabal-version:       >=1.2
+
+Executable hreal-client
+    hs-source-dirs: src
+    main-is:        HReal/Client/Client.hs
+    build-Depends:  gtk >= 0.12.3,
+                    base >= 4,
+                    glade >= 0.12.1,
+                    thrift >= 0.6,
+                    network >= 2.3.0.5,
+                    diagrams >= 0.5,
+                    diagrams-lib >= 0.5,
+                    diagrams-cairo >= 0.5.0.1,
+                    diagrams-contrib >= 0.1.1.0,
+                    haskell98 >= 1.1.0.1,
+                    containers >= 0.1,
+                    configurator >= 0.2,
+                    hreal-ifaces >= 0.1,
+                    hreal-common >= 0.1
+    ghc-options: -O -Wall

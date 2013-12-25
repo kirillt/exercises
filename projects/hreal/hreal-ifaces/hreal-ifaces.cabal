@@ -1,0 +1,28 @@
+Name:                hreal-ifaces
+Version:             0.1
+Author:              Kirill Taran
+Maintainer:          kirill.t256@gmail.com
+
+Category:            Learning
+Build-type:          Custom
+
+Cabal-version:       >=1.2
+
+Library
+    hs-source-dirs: generated, src
+    exposed-modules: HReal.Ifaces.World,
+                     HReal.Ifaces.CtrlZ,
+                     HReal.Ifaces.World_Iface,
+                     HReal.Ifaces.CtrlZ_Iface,
+                     HReal.Ifaces.World_Client,
+                     HReal.Ifaces.CtrlZ_Client,
+                     HReal.Ifaces.Vertex,
+                     HReal.Ifaces.Ifaces_Types,
+                     HReal.Ifaces.Ifaces_Consts
+    build-depends: base >= 4.0,
+                   split >= 0.1,
+                   thrift >= 0.6,
+                   containers >= 0.4,
+                   bytestring >= 0.9,
+                   hreal-common >= 0.1
+    ghc-options: -O -Wall

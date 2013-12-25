@@ -1,0 +1,22 @@
+Name:                hreal-server
+Version:             0.1
+Author:              Kirill Taran
+Maintainer:          kirill.t256@gmail.com
+
+Category:            Learning
+Build-type:          Simple
+
+Cabal-version:       >=1.2
+
+Executable hreal-server
+    hs-source-dirs: src
+    main-is:        HReal/Server/Main.hs
+    build-depends:  base >= 4,
+                    thrift >= 0.6,
+                    hint >= 0.3.3.4,
+                    containers >= 0.1,
+                    network >= 2.3.0.5,
+                    configurator >= 0.2,
+                    hreal-ifaces >= 0.1,
+                    hreal-common >= 0.1
+    ghc-options: -O -Wall
