@@ -37,7 +37,6 @@ public class AverageCalculator extends Agent {
             for (int i = 3; i < 3 + total; i++) {
                 agents.add(new AID((String)args[i],false));
             }
-            System.out.println("Total agents: " + total);
             addBehaviour(new SimpleBehaviour(this) {
                 private int     iteration = 0;
                 private boolean finished  = false;
@@ -67,6 +66,7 @@ public class AverageCalculator extends Agent {
                         received++;
                     }
                     if (finished) {
+                        System.out.println("Total agents: " + total);
                         System.out.println("Sended messages: " + sended);
                         System.exit(/* ^_^ */ 0);
                     }
@@ -99,7 +99,6 @@ public class AverageCalculator extends Agent {
                 private int temp = 0;
 
                 public void action() {
-                    //timestamp();
                     switch (phase) {
                         case READY: {
                             final ACLMessage acl = receive(matcher("go"));
@@ -115,10 +114,8 @@ public class AverageCalculator extends Agent {
                                 final ACLMessage acl = new ACLMessage(ACLMessage.PROPOSE);
                                 acl.addReceiver(to);
                                 if (k == i) {
-                                    //System.out.println(getAID().getName() + " sends his number to " + to.getName());
                                     acl.setContent(new NumberMessage(getAID(),number).toString());
                                 } else {
-                                    //System.out.println(getAID().getName() + " sends nothing to " + to.getName());
                                     acl.setContent(NumberMessage.nothing);
                                 }
                                 wrappedSend(acl);
@@ -151,15 +148,12 @@ public class AverageCalculator extends Agent {
                                 acl.addReceiver(from);
                                 if (receivedFrom.contains(from)) {
                                     if (k == i) {
-                                        //System.out.println(getAID().getName() + " sends average back to " + from.getName());
                                         acl.setContent(new AverageMessage(proportion * number + (1 - proportion) * received.get(from)).toString());
                                     } else {
-                                        //System.out.println(getAID().getName() + " sends no average back to " + from.getName());
                                         acl.setContent(AverageMessage.nothing);
                                     }
                                     i++;
                                 } else {
-                                    //System.out.println(getAID().getName() + " sends no average back to " + from.getName());
                                     acl.setContent(AverageMessage.nothing);
                                 }
                                 wrappedSend(acl);
