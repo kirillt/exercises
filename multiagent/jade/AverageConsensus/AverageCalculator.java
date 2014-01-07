@@ -22,6 +22,7 @@ public class AverageCalculator extends Agent {
 
     private static enum PHASE { READY, SEND_NUMBER, SEND_AVERAGE, SET_AVERAGE };
     private static int  sended = 0;
+    private static int  links  = 0;
 
     private static double proportion = 0;
 
@@ -67,6 +68,7 @@ public class AverageCalculator extends Agent {
                     }
                     if (finished) {
                         System.out.println("Total agents: " + total);
+                        System.out.println("Total links: " + total);
                         System.out.println("Sended messages: " + sended);
                         System.exit(/* ^_^ */ 0);
                     }
@@ -78,6 +80,7 @@ public class AverageCalculator extends Agent {
         } else {
             number = Double.parseDouble((String)args[0]);
             final TopologyUnit unit = new TopologyUnit(args, 1);
+            links += unit.toSize;
             addBehaviour(new SimpleBehaviour(this) {
                 private PHASE phase = PHASE.READY;
 
