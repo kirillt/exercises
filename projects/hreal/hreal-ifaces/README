@@ -1,0 +1,4 @@
+Thrift is necessary to build this package.
+It is used for code generation.
+
+There is 'sed' used in module names replacing, so it is required, too.

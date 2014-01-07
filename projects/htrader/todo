@@ -1,0 +1,17 @@
+Development & Refactoring:
+    iteratee - for secure authorization to btc-e.com
+    reimplement all Read instances with parser monad or something
+    separate caching facility from history
+    instance Num Wallet
+    extend quotations with amount
+    model timings (response can come in long time, should be modelled in simulation mode too (match time differences between entries in lis))
+    profile - strange performance on memoizing (criterion showed other)
+    provide tests
+    separate btc-e logic and other concrete things into subpackage
+    data Trader = Real | Simulated
+    typed numbers (currencies)
+
+Algorithms & Research:
+    analyse amount
+    bots often make fake bids with 0.0001 btc or something -- handle these cases too!
+    multi-pair strategies, btw it is possible to test it by merging different histories into the big one
