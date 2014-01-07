@@ -21,15 +21,14 @@ public class TopologyUnit {
         final Set<AID> from = new HashSet<AID>();
         final Set<AID> to = new HashSet<AID>();
         for (int i = start; i < args.length; i++) {
-            String[] parts = ((String)args[i]).split("\\s+");
-            if (parts.length != 2) {
-                badInput(args[i]);
-            }
-            final AID aid = new AID(parts[1], false);
-            if ("from".equals(parts[0])) {
-               from.add(aid); 
+            final String arg  = (String)args[i];
+            final String mark = arg.substring(0,2);
+            final String name = arg.substring(2);
+            final AID aid = new AID(name, false);
+            if ("<-".equals(mark)) {
+               from.add(aid);
             } else
-            if ("to".equals(parts[0])) {
+            if ("->".equals(mark)) {
                to.add(aid);
             } else {
                 badInput(args[i]);
