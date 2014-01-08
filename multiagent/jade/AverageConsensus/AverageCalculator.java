@@ -62,7 +62,7 @@ public class AverageCalculator extends Agent {
                         final ACLMessage acl = blockingReceive(NumberMessage.matcher);
                         if (finished) {
                             final NumberMessage msg = NumberMessage.parse(acl.getContent());
-                            System.out.println(msg.name.getName() + " = " + msg.number);
+                            System.out.println(msg.name.getLocalName() + " = " + msg.number);
                         }
                         received++;
                     }
@@ -96,7 +96,7 @@ public class AverageCalculator extends Agent {
                         case SET_AVERAGE:  phaseStr = "SET_AVERAGE";  break;
                         default:           phaseStr = "?";
                     }
-                    System.out.println(getAID().getName() + " " + phaseStr);
+                    System.out.println(getAID().getLocalName() + " " + phaseStr);
                 }
 
                 private int temp = 0;
@@ -211,7 +211,7 @@ public class AverageCalculator extends Agent {
         }
         @Override
         public String toString() {
-            return "number" + " " + name.getName() + " " + String.valueOf(number);
+            return "number" + " " + name.getLocalName() + " " + String.valueOf(number);
         }
         public static NumberMessage parse(final String input) {
             final String[] parts = input.split("\\s+");
