@@ -44,18 +44,15 @@ function tasks() {
             if [ -z "$error" ]
             then
                 cat .log | sed -n -e '/after/,$p' | sed s/.*\\r//g | grep -v "\=" > .temp
-                #rm .log
+                rm .log
 
-                iterations=`cat .temp | head -1 | awk '{print $3}'`
-                proportion=`cat .temp | head -1 | awk '{print $7}' | sed s/\://g`
                 agents=`cat .temp | head -2 | tail -1 | awk '{print $3}'`
                 links=`cat .temp | head -3 | tail -1 | awk '{print $3}'`
                 messages=`cat .temp | head -4 | tail -1 | awk '{print $3}'`
                 rm .temp
 
                 cost=`echo "$link_cost * $links + $message_cost * $messages" | bc`
-                echo -n "Input: $iterations iterations; proportion $proportion; "
-                echo -n "$agents agents; $links links. "
+                echo -n "Input: $agents agents; $links links. "
                 echo    "Sended $messages messages. Cost of topology: $cost"
             else
                 echo "Failed."
@@ -68,7 +65,7 @@ function tasks() {
         summary
     }
 
-    limit=1000
+    limit=10
     proportion=0.5
 
     function manager() {
@@ -83,28 +80,70 @@ function tasks() {
     function cycle()  {
         k=$1 # max number
         p=$k # previous number
+        for i in $(seq 1 $k)
+        do
+            n=$(expr $i + 1) # next number
+            if [ $n -gt $k ]
+            then
+                n=$(expr $n - $k)
+            fi
+
+            echo -n "agent$i $RANDOM "
+            echo -n "\"<-agent$p\" "
+            echo -n "\"->agent$n\" "
+            echo -n "! "
+
+            p=$i
+        done
+        manager $k
+    }
+
+    function cycle2() { # 2-transitive closure of cycle
+        k=$1 # max number
+        p=$k # previous number
+        pp=$(expr $k - 1) # previous-previous number (2-transitive)
         for i in $(seq 1 $(expr $k - 1))
         do
             n=$(expr $i + 1) # next number
-            echo -n "agent$i $RANDOM \"<-agent$p\" \"->agent$n\" ! "
+            nn=$(expr $i + 2) # next-next number (2-transitive)
+            if [ $n -gt $k ]
+            then
+                n=$(expr $n - $k)
+            fi
+            if [ $nn -gt $k ]
+            then
+                nn=$(expr $nn - $k)
+            fi
+
+            echo -n "agent$i $RANDOM "
+            echo -n "\"<-agent$p\" "
+            echo -n "\"<-agent$pp\" "
+            echo -n "\"->agent$n\" "
+            echo -n "\"->agent$nn\" "
+            echo -n "! "
+
+            pp=$p
             p=$i
         done
         echo -n "agent$k $RANDOM \"<-agent$p\" \"->agent1\" ! "
-        manager $n
-    }
-
-    function full() {
-        n=$1
+        manager $k
     }
 
     rm .failed &> /dev/null
 
     echo "Cost of link: $link_cost; cost of message: $message_cost."
+    echo "Iterations limit: $limit; proportion: $proportion."
 
-    for i in `seq 1 100`
+    echo -e "***\nSection I. Cycle topologies.\n***"
+    for i in `seq 1 50`
     do
-        echo -n "Topology: cycle of $i vertices. "
         average `cycle $i`
+    done
+
+    echo -e "***\nSection II. 2-transitive closures of cycle topologies.\n***"
+    for i in `seq 5 50`
+    do
+        echo -n "Topology: 2-transitive closure of cycle of $i vertices. "
     done
 
     #average \
@@ -120,7 +159,7 @@ function tasks() {
         #y 8.2   "<-w"       "->x"       ! \
         #z 0.5   "<-w"       "->q" "->x" ! \
         #manager "manager" $limit $proportion "q" "w" "x" "y" "z" !
-    echo "Done."
+    #echo "Done."
 }
 
 > tasks.log

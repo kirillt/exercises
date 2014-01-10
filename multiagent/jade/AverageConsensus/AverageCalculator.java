@@ -68,7 +68,7 @@ public class AverageCalculator extends Agent {
                     }
                     if (finished) {
                         System.out.println("Total agents: " + total);
-                        System.out.println("Total links: " + total);
+                        System.out.println("Total links: "  + links);
                         System.out.println("Sended messages: " + sended);
                         System.exit(/* ^_^ */ 0);
                     }
