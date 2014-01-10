@@ -51,7 +51,9 @@ function tasks() {
             rm .temp
 
             cost=`echo "$link_cost * $links + $message_cost * $messages" | bc`
-            echo "Input: $iterations iterations; proportion $proportion; $agents agents; $links links. Sended $messages messages. Cost of topology: $cost"
+            echo -n "Input: $iterations iterations; proportion $proportion; "
+            echo -n "$agents agents; $links links."
+            echo    "Sended $messages messages. Cost of topology: $cost"
         }
         
         launch $(args $@) &> .log
