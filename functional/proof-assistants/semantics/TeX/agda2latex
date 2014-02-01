@@ -1,2 +1,0 @@
-#!/bin/sh
-$PREFIX/sandbox/bin/agda.exe -i . -i $PREFIX/. -i $PREFIX/sandbox/agda-lib-0.7/src --allow-unsolved-metas --latex --latex-dir=$PREFIX/. $@
