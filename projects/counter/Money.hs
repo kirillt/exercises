@@ -20,10 +20,14 @@ currencies :: [String]
 currencies = map show [USD,EUR,RUR]
 
 data Money = Money {
-  cur :: Currency,
-  n   :: Double
+  cur  :: Currency,
+  num' :: Double
 } | Zero -- zero polymorphic on currency
   deriving (Show,Eq)
+
+num :: Money -> Double
+num (Money c n) = n
+num  Zero       = 0
 
 instance Read Money where
   readsPrec p s = do
@@ -47,7 +51,7 @@ cur2cur Zero _ = Zero
 plus :: Money -> Money -> Money
 plus Zero r = r
 plus l Zero = l
-plus l r = Money (curOf l r) $ n l + n r
+plus l r = Money (curOf l r) $ num l + num r
   where
     curOf :: Money -> Money -> Currency
     curOf (Money cl _) (Money cr _) | cl == cr = cl

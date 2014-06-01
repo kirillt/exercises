@@ -1,6 +1,6 @@
 module Common where
 
-import Money (Money (Money), Currency)
+import Money (Money (Money,Zero), Currency)
 import Time.Time (UnixTime)
 
 type Name  = String
@@ -19,9 +19,9 @@ amount (Terminal    _ m _) = m
 amount (Nonterminal _ m  ) = m
 
 instance Show Stats where
-  show s =
+  show s = name s ++ " (" ++
     case amount s of
       Money c m ->
-        name s ++ " (" ++
           show m ++ " " ++ show c
-        ++ ")"
+      Zero -> "0"
+    ++ ")"

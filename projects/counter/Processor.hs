@@ -3,7 +3,9 @@
 module Processor where
 
 import Common
-import Money (Money(Zero), n, plus)
+import Money (Money(Zero), num, plus)
+
+import Debug.Trace
 
 import Data.List hiding (isInfixOf)
 import Data.Tree
@@ -33,36 +35,50 @@ process = join "All" . work
 
     step :: Int -> Acc -> Tree Stats -> Acc
     step k acc@(trees,curr) tree@(Node x _) =
-      let new    = nonterminal k (n $ amount x) (name x) in
-      let subset = new == name x in
+      let new    = nonterminal k (num $ amount x) (name x) in
+      let subset = new == name x && isNonterminal x in
       let single = if subset then  subForest tree     else [tree]  in
       let append = if subset then (subForest tree ++) else (tree:) in
       let fresh = Just (new, single)
       in case curr of
            Nothing -> (trees, fresh)
            Just curr'@(old,xs) ->
-             if old /= new then (finish acc, fresh)
-                           else (trees, Just (old, append xs))
+             if old /= new && old /= name x
+             then (finish acc, fresh)
+             else (trees, Just (old, append xs))
 
     base :: Acc
     base = ([], Nothing)
 
     join :: Name -> Forest Stats -> Tree Stats
-    join name xs = Node (Nonterminal name $ total xs) xs
+    join name [tree@(Node (Terminal n _ _) [])] | n == name = tree
+    join name xs  = Node (Nonterminal name $ total xs) xs
 
     finish :: Acc -> Forest Stats
-    finish (trees, Nothing    ) = trees
-    finish (trees, Just (n,xs)) = join n xs : trees
+    finish (trees, Nothing     ) = trees
+    finish (trees, Just (n, xs)) = join n xs : trees
 
     total :: Forest Stats -> Money
     total = foldl' plus Zero . map (\(Node x _) -> amount x)
 
+isNonterminal :: Stats -> Bool
+isNonterminal (Nonterminal _ _) = True
+isNonterminal _ = False
+
 nonterminal :: Int -> Double -> Name -> Name
-nonterminal k m = rules . strip . toLower . pack
+nonterminal k m orig = pipe orig
   where
+    pipe = rules . strip . toLower . pack
+
     rules :: Text -> String
     rules n | "salary" `isInfixOf` n = "@salary"
+
     rules n | "fee"    `isInfixOf` n = "@fee"
+
+    rules n | "r-conn" `isInfixOf` n = "@raiffeisen-connect"
+    rules n | "raiffe" `isInfixOf` n && "connect" `isInfixOf` n = "@fee"
+
+    rules n | "rc" `isInfixOf` n && "qw" `isInfixOf` n = "@strange"
 
     rules n | "sberba" `isInfixOf` n = "@atm"
     rules n | "bank"   `isInfixOf` n = "@atm"
@@ -106,8 +122,9 @@ nonterminal k m = rules . strip . toLower . pack
     rules n | "medi"   `isInfixOf` n && not ("wiki" `isInfixOf` n) = "@medicine"
     rules n | "stoma"  `isInfixOf` n = "@medicine"
 
-    rules n | "idsoft" `isInfixOf` n = "@games"
     rules n | "steam"  `isInfixOf` n = "@games"
+    rules n | "sony"   `isInfixOf` n && "ent" `isInfixOf` n = "@games"
+    rules n | "soft"   `isInfixOf` n && "id"  `isInfixOf` n = "@games"
 
     rules n | "googl"  `isInfixOf` n = "@soft"
     rules n | "githu"  `isInfixOf` n = "@soft"
@@ -119,12 +136,14 @@ nonterminal k m = rules . strip . toLower . pack
     rules n | "arco"   `isInfixOf` n = "@italy"
     rules n | "riva"   `isInfixOf` n = "@italy"
     rules n | "gard"   `isInfixOf` n = "@italy"
-    rules n | "ital"   `isInfixOf` n = "@italy"
     rules n | "dro"    `isInfixOf` n = "@italy"
+
+    rules n | "transae"`isInfixOf` n = "@planes"
+    rules n | "alitali"`isInfixOf` n = "@planes"
 
     rules n | "marsei" `isInfixOf` n = "@france"
     rules n | "cirm"   `isInfixOf` n = "@france"
 
-    rules _ | k > 10 && m > 0 = "@positive"
-    rules _ | k > 10 && m < 0 = "@negative"
-    rules n = unpack n
+    rules _ | k < 10 && m > 0 = "@positive"
+    rules _ | k < 10 && m < 0 = "@negative"
+    rules _ = orig
