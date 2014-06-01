@@ -32,7 +32,7 @@ type Fiber = (Desc,[Point])
 
 draw :: Tree Stats -> IO ()
 draw result = do
-  success <- plot (PNG "plot.png") $ prepare result
+  success <- plot' [Debug] (PNG "plot.png") $ prepare result
   putStrLn $ "Plot building suceeded: " ++ show success
     where
       prepare :: Tree Stats -> [Graph2D Double Double]

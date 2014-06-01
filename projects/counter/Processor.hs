@@ -70,10 +70,13 @@ nonterminal k m orig = pipe orig
   where
     pipe = rules . strip . toLower . pack
 
-    rules :: Text -> String
-    rules n | "salary" `isInfixOf` n = "@salary"
+    fix :: Text -> Bool
+    fix n = not $ "@" `isInfixOf` n
 
-    rules n | "fee"    `isInfixOf` n = "@fee"
+    rules :: Text -> String
+    rules n | "salary" `isInfixOf` n && fix n = "@salary"
+
+    rules n | "fee"    `isInfixOf` n && fix n = "@fee"
 
     rules n | "r-conn" `isInfixOf` n = "@raiffeisen-connect"
     rules n | "raiffe" `isInfixOf` n && "connect" `isInfixOf` n = "@fee"
@@ -119,7 +122,7 @@ nonterminal k m orig = pipe orig
     rules n | "apteka" `isInfixOf` n = "@drugs"
 
     rules n | "medser" `isInfixOf` n = "@medicine"
-    rules n | "medi"   `isInfixOf` n && not ("wiki" `isInfixOf` n) = "@medicine"
+    rules n | "medi"   `isInfixOf` n && not ("wiki" `isInfixOf` n) && fix n = "@medicine"
     rules n | "stoma"  `isInfixOf` n = "@medicine"
 
     rules n | "steam"  `isInfixOf` n = "@games"
