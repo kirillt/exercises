@@ -19,8 +19,8 @@ exit msg = do
 
 type Row = (String,String,String,String,String)
 
-scan :: String -> [String] -> IO [Entry]
-scan file opts = do
+scan :: [String] -> String -> IO [Entry]
+scan opts file = do
   input <- readFile file
   either exit
     (return . map convert . toList)
