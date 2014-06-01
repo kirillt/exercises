@@ -32,11 +32,12 @@ type Fiber = (Desc,[Point])
 
 draw :: Tree Stats -> IO ()
 draw result = do
-  success <- plot' [Debug] (PNG "plot.png") $ prepare result
-  putStrLn $ "Plot building suceeded: " ++ show success
+  let graphs = prepare result
+  success <- plot' [Debug] (PNG "plot.png") graphs
+  putStrLn $ "Plot building of " ++ show (length graphs) ++ " suceeded: " ++ show success
     where
       prepare :: Tree Stats -> [Graph2D Double Double]
-      prepare = map graph . fibration
+      prepare = reverse . map graph . fibration
 
       graph :: Fiber -> Graph2D Double Double
       graph ((n,m),ps) = main $ map convert ps
@@ -47,10 +48,13 @@ draw result = do
                     let l   = listToMaybe           ps' in
                     let range = case (l,r) of { (Just l', Just r') ->
                       [Range (fst l') (fst r')] ; _ -> [] }
-                    in  Data2D [Style Impulses, Title n, Color color] range ps'
+                    in  Data2D [Style Lines, Title n, Color $ color n] range ps'
 
-          color :: Color
-          color = RGB r g b
+          color :: Name -> Color
+          color n | n == "@all"      = RGB 192 192 192
+          color n | n == "@positive" = RGB 64  192 128
+          color n | n == "@negative" = RGB 192 64  128
+          color _ = RGB r g b
             where
               norma :: Double -> Double
               norma x = x * 127 / 800000

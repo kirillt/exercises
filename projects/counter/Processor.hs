@@ -16,7 +16,7 @@ import Data.Text (Text, pack, unpack, strip, toLower, isInfixOf)
 type Acc = (Forest Stats, Maybe (Name, Forest Stats))
 
 process :: [Entry] -> Tree Stats
-process = join "All" . work
+process = join "@all" . work
   where
     work :: [Entry] -> Forest Stats
     work =
@@ -116,6 +116,9 @@ nonterminal k m orig = pipe orig
     rules n | "tramon" `isInfixOf` n = "@wear"
     rules n | "colins" `isInfixOf` n = "@wear"
     rules n | "armand" `isInfixOf` n = "@wear"
+
+    rules n | "barnes" `isInfixOf` n = "@books"
+    rules n | "bukvoy" `isInfixOf` n = "@books"
 
     rules n | "zdorov" `isInfixOf` n = "@drugs"
     rules n | "pharma" `isInfixOf` n = "@drugs"
