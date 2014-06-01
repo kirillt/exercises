@@ -22,7 +22,8 @@ currencies = map show [USD,EUR,RUR]
 data Money = Money {
   cur :: Currency,
   n   :: Double
-} deriving (Show,Eq)
+} | Zero -- zero polymorphic on currency
+  deriving (Show,Eq)
 
 instance Read Money where
   readsPrec p s = do
@@ -41,3 +42,12 @@ cur2cur (Money c1 d) c2 = Money c2 $ work c1 c2
     work EUR USD = d * 1.36
     work USD EUR = d / 1.36
     work x y | x == y = d
+cur2cur Zero _ = Zero
+
+plus :: Money -> Money -> Money
+plus Zero r = r
+plus l Zero = l
+plus l r = Money (curOf l r) $ n l + n r
+  where
+    curOf :: Money -> Money -> Currency
+    curOf (Money cl _) (Money cr _) | cl == cr = cl

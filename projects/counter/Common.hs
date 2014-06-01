@@ -7,9 +7,21 @@ type Name  = String
 type Time  = UnixTime
 type Entry = (Time,Name,Money)
 
-data Stats = Rubric String Int
-           | Amount Money
+data Stats = Terminal    Name Money Time
+           | Nonterminal Name Money
+
+name :: Stats -> Name
+name (Terminal    n _ _) = n
+name (Nonterminal n _  ) = n
+
+amount :: Stats -> Money
+amount (Terminal    _ m _) = m
+amount (Nonterminal _ m  ) = m
 
 instance Show Stats where
-  show (Rubric  name    n ) = name ++ " (" ++ show n ++ ")"
-  show (Amount (Money c n)) = show c ++ " " ++ show n
+  show s =
+    case amount s of
+      Money c m ->
+        name s ++ " (" ++
+          show m ++ " " ++ show c
+        ++ ")"

@@ -27,15 +27,21 @@ scan opts file = do
     (decode NoHeader input)
   where
     convert :: Row -> Entry
-    convert (t1,t2,d,mc,mr) =
-      (timestamp t1 t2, d, money mc mr)
+    convert (t1,t2,d,mc,mn) =
+      (timestamp t1 t2, d, money mc mn)
 
---    timestamp t1 t2 | t1 /= t2 =
---      unsafePerformIO $ exit "Timestamps don't match."
-    timestamp t _ = read t :: UnixTime
+    timestamp :: String -> String -> UnixTime
+    timestamp t _ = read t
 
-    money mc _ = cur2cur (read mc) currency
+    money :: String -> String -> Money
+    money mc mn = withSign $ cur2cur (read mc) currency
       where
+        sign :: Double
+        sign = signum (read mn :: Double)
+
+        withSign :: Money -> Money
+        withSign (Money c n) = Money c $ n * sign
+
         currency :: Currency
         currency = fromMaybe RUR $ listToMaybe $
           map    (read      . fst) $
