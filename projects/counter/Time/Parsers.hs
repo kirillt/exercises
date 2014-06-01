@@ -17,6 +17,7 @@ toDate s | checkDate s = parse s
          | otherwise = []
     where
         parse [y1,y2,y3,y4,'.',m1,m2,'.',d1,d2] = [(Year,toNumber4 y1 y2 y3 y4), (Month,toNumber2 m1 m2), (Day, toNumber2 d1 d2)]
+        parse [d1,d2,'.',m1,m2,'.',y1,y2,y3,y4] = [(Year,toNumber4 y1 y2 y3 y4), (Month,toNumber2 m1 m2), (Day, toNumber2 d1 d2)]
         parse _ = []
 
         checkDate = all isDigit . filter (/= '.')
