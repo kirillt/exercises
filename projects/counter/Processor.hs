@@ -48,4 +48,4 @@ terminal :: Entry -> (Name, Money)
 terminal (_,n,m) = (n,m)
 
 nonterminal :: Name -> Name
-nonterminal _ = undefined
+nonterminal n = n --undefined
