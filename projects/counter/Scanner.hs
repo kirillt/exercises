@@ -27,11 +27,11 @@ scan file opts = do
     (decode NoHeader input)
   where
     convert :: Row -> Entry
-    convert r@(t1,t2,d,mc,mr) =
+    convert (t1,t2,d,mc,mr) =
       (timestamp t1 t2, d, money mc mr)
 
-    timestamp t1 t2 | t1 /= t2 =
-      unsafePerformIO $ exit "Timestamps don't match."
+--    timestamp t1 t2 | t1 /= t2 =
+--      unsafePerformIO $ exit "Timestamps don't match."
     timestamp t _ = read t :: UnixTime
 
     money mc _ = cur2cur (read mc) currency
