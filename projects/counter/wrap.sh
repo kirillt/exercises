@@ -8,9 +8,9 @@ then
   sed -i '1s/^/set terminal png medium size 1366,768;\n/' raw.gp
   sed -i 's/lc\ rgb/lw 4 pt 6 lc rgb/g' raw.gp
   sed -i '$ d' raw.gp
-  #gnuplot raw.gp &> /dev/null
-  #rm raw.gp
-  #rm *.dat
+  gnuplot raw.gp &> /dev/null
+  rm raw.gp
+  rm *.dat
 else
   $@
 fi
