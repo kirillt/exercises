@@ -50,16 +50,16 @@ draw result = do
                     in  Data2D [Style Impulses, Title n, Color color] range ps'
 
           color :: Color
-          color = RGB r g b -- | traceShow ("r: ",r,"g: ",g,"b: ", b) True
+          color = RGB r g b
             where
               norma :: Double -> Double
-              norma x = x * 127 / 350000
+              norma x = x * 127 / 800000
 
               m' :: Double
               m' = num m
 
-              r = round (128 + norma (negate m'))
-              g = round (192 + norma m')
+              r = min 255 $ max 0 $ round (128 + norma (negate m'))
+              g = min 255 $ max 0 $ round (192 + norma m')
               b = (239 * length n) `mod` 255
 
           convert :: (Time,Money) -> (Double,Double)
