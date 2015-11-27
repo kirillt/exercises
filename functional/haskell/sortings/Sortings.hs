@@ -1,5 +1,6 @@
 {-# LANGUAGE ImpredicativeTypes #-}
 
+import Data.List
 import Data.Traversable
 
 main = for sortings $ \(s,f) -> do
@@ -30,7 +31,8 @@ type Sorting = forall a . Ord a => [a] -> [a]
 
 sortings :: [(String, Sorting)]
 sortings = [ ("mergesort", mergesort)
-           , ("quicksort (inefficient)", quicksort) ]
+           , ("quicksort (inefficient)", quicksort)
+           , ("stdlib sort", sort) ]
 
 mergesort :: Sorting
 mergesort []  = []
