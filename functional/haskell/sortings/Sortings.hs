@@ -17,19 +17,20 @@ check xs = all (uncurry (<=)) $ zip xs $ safetail xs
     safetail xs = tail xs
 
 cases :: [[Integer]]
-cases = [[],
-         [1],
-         [2,1],
-         [3,2,1],
-         [2,3,1],
-         [2,2,1],
-         [1,1,1],
-         [4,3,2,1]]
+cases = [ []
+        , [1]
+        , [2,1]
+        , [3,2,1]
+        , [2,3,1]
+        , [2,2,1]
+        , [1,1,1]
+        , [4,3,2,1]]
 
 type Sorting = forall a . Ord a => [a] -> [a]
 
 sortings :: [(String, Sorting)]
-sortings = [("mergesort", mergesort)]
+sortings = [ ("mergesort", mergesort)
+           , ("quicksort (inefficient)", quicksort) ]
 
 mergesort :: Sorting
 mergesort []  = []
@@ -42,4 +43,16 @@ mergesort zs  = let (xs,ys) = split zs
     merge xs@(x:xt) ys@(y:yt) = if x <= y then x : merge xt ys else y : merge xs yt
 
     split :: [a] -> ([a],[a])
-    split = foldr (\z (xs,ys) -> (z:ys,xs)) ([],[])
+    split = foldl (\(xs,ys) z -> (z:ys,xs)) ([],[])
+
+quicksort :: Sorting
+quicksort [] = []
+quicksort (x:xs) =
+  let (ls,es,gs) = split x xs
+  in quicksort ls ++ [x] ++ es ++ quicksort gs
+  where
+    split x = foldl (\(ls,es,gs) z -> case z `compare` x of
+                                      LT -> (z:ls,es,gs)
+                                      EQ -> (ls,z:es,gs)
+                                      GT -> (ls,es,z:gs))
+                    ([],[],[])
