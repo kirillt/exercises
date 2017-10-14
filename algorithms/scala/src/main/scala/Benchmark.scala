@@ -3,13 +3,8 @@ import scalax.chart.module.Charting
 
 object Benchmark extends App with Charting {
 
-  val N = 100000
-  val Step = 200
-
-  val generators = Map(
-    "sorted" -> ((n: Int) => Array[Int](1 to n :_*)),
-    "random" -> ((n: Int) => Array[Int]((1 to n)
-      .map(_ => Random.nextInt(100)) :_*)))
+  val N = 10000
+  val Step = 1000
 
   val sortings = Map(
     "bubble" -> BubbleSort.sort
@@ -17,7 +12,7 @@ object Benchmark extends App with Charting {
 
   def verify(sort: Array[Int] => Unit): Unit = {
     for (n <- 1 to 1000) {
-      val array = generators("random")(n)
+      val array = Generators.arrays("random")(n)
       sort(array)
       for (Array(x,y) <- array.sliding(2, 1)) {
         assert(x <= y)
@@ -32,7 +27,7 @@ object Benchmark extends App with Charting {
   val plot =
     for {
       (algorithmLabel, sort) <- sortings.toSeq
-      (generatorLabel, generator) <- generators.toSeq
+      (generatorLabel, generator) <- Generators.arrays.toSeq
     } yield {
       val label = s"$algorithmLabel-$generatorLabel"
 
@@ -60,6 +55,7 @@ object Benchmark extends App with Charting {
     "O(n²)" -> (1 to N).map(n => (n, sqr(n))))
 
   val chart = XYLineChart(plot ++ marks)
-  chart.saveAsPNG(s"/home/kirillt/Desktop/bubble.png", (1024,1024))
+  //chart.saveAsPNG(s"/home/kirillt/Desktop/bubble.png", (1024,1024))
+  chart.saveAsPNG(s"chart.png", (1024,1024))
 
 }
