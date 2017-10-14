@@ -1,6 +1,6 @@
 object BubbleSort {
 
-  def sort: Array[Int] => Unit = {
+  val sort: Array[Int] => Unit = {
     array =>
       val n = array.length
       for (i <- array.indices) {
