@@ -1,12 +1,14 @@
-class BinaryHeap extends PriorityQueue {
+import scala.reflect.ClassTag
 
-  private var array: Array[Int] = Array()
+class BinaryHeap[T](implicit ord: T => Ordered[T], ct: ClassTag[T]) extends PriorityQueue[T] {
+
+  private var array: Array[T] = Array[T]()
   private var limit: Int = 0
   private var size: Int = 0
 
   override def isEmpty: Boolean = limit < 0
 
-  override def push(w: Int): BinaryHeap = {
+  override def push(w: T): Unit = {
     if (limit >= size) {
       resize(size * 2)
     }
@@ -21,10 +23,9 @@ class BinaryHeap extends PriorityQueue {
       i = p
       p = parent(i)
     }
-    this
   }
 
-  override def pop(): Int = {
+  override def pop(): T = {
     val value = array(0)
 
     limit -= 1
@@ -44,8 +45,8 @@ class BinaryHeap extends PriorityQueue {
     value
   }
 
-  private def resize(n: Int): BinaryHeap = {
-    val fresh: Array[Int] = Array.ofDim(n)
+  private def resize(n: Int): BinaryHeap[T] = {
+    val fresh: Array[T] = Array.ofDim[T](n)
     array.copyToArray(fresh, 0, Math.min(n, size))
     array = fresh
     size = n
@@ -71,23 +72,26 @@ class BinaryHeap extends PriorityQueue {
   }
 
   private def swap(i: Int, j : Int) = {
-    array(i) = array(i) ^ array(j)
-    array(j) = array(i) ^ array(j)
-    array(i) = array(i) ^ array(j)
+    val x = array(i)
+    array(i) = array(j)
+    array(j) = x
   }
 
 }
 
 object BinaryHeap {
 
-  def apply(): BinaryHeap =
-    BinaryHeap(4)
+  def apply[T]()
+      (implicit ord: T => Ordered[T], ct: ClassTag[T]): BinaryHeap[T] =
+    BinaryHeap[T](4)
 
-  def apply(size: Int): BinaryHeap =
-    new BinaryHeap().resize(size)
+  def apply[T](size: Int)
+      (implicit ord: T => Ordered[T], ct: ClassTag[T]): BinaryHeap[T] =
+    new BinaryHeap[T]().resize(size)
 
-  def apply(ws: Seq[Int]): BinaryHeap = {
-    val heap = BinaryHeap(ws.size)
+  def apply[T](ws: Seq[T])
+      (implicit ord: T => Ordered[T], ct: ClassTag[T]): BinaryHeap[T] = {
+    val heap = BinaryHeap[T](ws.size)
     for (w <- ws) {
       heap.push(w)
     }

@@ -1,9 +1,9 @@
-trait PriorityQueue {
+trait PriorityQueue[T] {
 
   def isEmpty: Boolean
 
-  def push(weight: Int): PriorityQueue
+  def push(weight: T): Unit
 
-  def pop(): Int
+  def pop(): T
 
 }
