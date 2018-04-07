@@ -1,8 +1,9 @@
 #[derive(Debug)]
 #[derive(Clone)]
 pub enum Tree<T> {
-    Nil, Leaf(T),
-    // sacrificing code simplicity for the sake of structure compactness
+    Nil,
+
+    Leaf(T),
 
     Join {
         left: Box<Tree<T>>,
@@ -12,62 +13,67 @@ pub enum Tree<T> {
 }
 
 impl<T> Tree<T> {
-    fn nil() -> Box<Tree<T>> {
-        Box::new(Tree::Nil)
-    }
-
-    fn leaf(value: T) -> Box<Tree<T>> {
-        Box::new(Tree::Leaf(value))
+    fn leaf(value: T) -> Tree<T> {
+        Tree::Leaf(value)
     }
 
     fn join(left: T, right: T) -> Tree<Option<T>> {
+        Tree::union(Tree::leaf(Some(left)),
+                    Tree::leaf(Some(right)))
+    }
+
+    fn union(left: Tree<Option<T>>, right: Tree<Option<T>>) -> Tree<Option<T>> {
         Tree::Join {
-            left: Tree::leaf(Some(left)),
-            right: Tree::leaf(Some(right)),
+            left: Box::new(left),
+            right: Box::new(right),
             value: None
         }
     }
 
     fn from_forest(forest: Vec<Tree<Option<T>>>) -> Tree<Option<T>> {
-        let chunks: Vec<&[Tree<Option<T>>]> = forest.chunks(2).collect();
-        match chunks.split_last() {
-            Some((last, pairs)) => {
-                let mut forest: Vec<Tree<Option<T>>> = pairs.into_iter().map({ |chunk|
-                    Tree::Join {
-                        left: Box::new(chunk[0]), right: Box::new(chunk[1]),
-                        value: None
-                    }
-                }).collect();
-
-                let odd: Tree<_> = last[0];
-                let last = match last.get(1) {
-                    Some(even) => Tree::Join {
-                        left: Box::new(odd), right: Box::new(*even),
-                        value: None
-                    },
-                    None => odd
-                };
-
-                //todo: recursive call
-                forest.push(last);
-                forest
-            },
-            None => Tree::Nil
+        if forest.is_empty() {
+            return Tree::Nil;
         }
+
+        let mut result = Tree::grow(forest);
+        while result.len() > 1 {
+            result = Tree::grow(result);
+        }
+        result.swap_remove(0)
     }
 
     fn from_leaves(values: Vec<T>) -> Tree<Option<T>> {
-        let forest: Vec<Tree<_>> = values.into_iter().map(|v| Tree::leaf(v)).collect();
-        Tree::from_forest(forest)
+        Tree::from_forest(values.into_iter()
+            .map(|v| Tree::leaf(Some(v)))
+            .collect())
+    }
+
+    fn grow(forest: Vec<Tree<Option<T>>>) -> Vec<Tree<Option<T>>> {
+        let mut result = Vec::new();
+        let mut left = None;
+        for tree in forest.into_iter() {
+            if left.is_none() {
+                left = Some(tree);
+            } else {
+                result.push(Tree::union(left.unwrap(), tree));
+                left = None;
+            }
+        }
+        if left.is_some() {
+            result.push(left.unwrap());
+        }
+        result
     }
 }
 
 pub fn test() {
-    println!("{:?}", Tree::leaf(1));
+    println!("1 x 2\n\t{:?}\n",
+             Tree::join(1,2));
 
-//    let v = vec![1,2,3];
-//    let x: Vec<&[u8]> = v.chunks(2).collect();
-//    println!("{:?}", x);
-
-    println!("{:?}", Tree::join(1,2));
+    let mut leaves: Vec<usize> = Vec::new();
+    for i in 1..10 {
+        leaves.push(i);
+        println!("{:?}\n\t{:?}\n", leaves,
+                 Tree::from_leaves(leaves.clone()));
+    }
 }
