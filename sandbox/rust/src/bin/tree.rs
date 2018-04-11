@@ -14,7 +14,6 @@ pub enum Tree<T> {
     }
 }
 
-#[allow(dead_code)]
 impl<T> Tree<T> {
 
     fn join(left: T, right: T) -> Tree<Option<T>> {
@@ -113,19 +112,6 @@ impl<T> Tree<T> {
         }
     }
 
-    pub fn into_map_separately<R>(self, on_leaf: &Fn(T) -> R,
-                                  on_branch: &Fn(&R,&R,T) -> R) -> Tree<R> {
-        self.into_fold(&|| Tree::Nil, &|x| Tree::Leaf(on_leaf(x)),
-                       &|l,r,v| Tree::Branch {
-                      value: on_branch(l.value(), r.value(), v),
-                      left: Box::new(l), right: Box::new(r)
-                  })
-    }
-
-    pub fn into_map<R>(self, f: &Fn(T) -> R) -> Tree<R> {
-        self.into_map_separately(f, &|_, _, v| f(v))
-    }
-
 }
 
 impl<T> FromIterator<T> for Tree<Option<T>> {
@@ -136,10 +122,8 @@ impl<T> FromIterator<T> for Tree<Option<T>> {
 
 }
 
-#[allow(dead_code)]
-pub fn test() {
-    println!("1 x 2\n\t{:?}\n",
-             Tree::join(1,2));
+fn main() {
+    println!("1 x 2\n\t{:?}\n", Tree::join(1,2));
 
     let mut leaves: Vec<usize> = Vec::new();
     for i in 1..10 {
@@ -163,6 +147,10 @@ pub fn test() {
     println!();
 
     let tree_of_sums: Tree<usize> = nine_leaves.map_separately(&|x| x.unwrap(), &|l, r, _| l + r);
-    println!("sums:\n{:?}", tree_of_sums);
+    println!("tree of sums:\n{:?}", tree_of_sums);
     println!();
+
+    let factorial = nine_leaves.into_fold(&|| 1, &|x| x.unwrap(), &|l, r, _| l * r);
+    println!("factorial\n: {}", factorial);
+    //nine_leaves are destroyed after into_fold
 }
