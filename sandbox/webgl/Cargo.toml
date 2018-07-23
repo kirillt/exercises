@@ -1,6 +1,6 @@
 [package]
-name = "webgl-example"
+name = "webgl-wasm"
 version = "0.1.0"
 
 [dependencies]
-# stdweb = "0.4.7"
+stdweb = "0.4.7"
