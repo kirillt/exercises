@@ -2,47 +2,81 @@
 
 #[macro_use]
 extern crate stdweb;
+extern crate rand;
 
+mod vector;
+mod render;
+mod figures;
+mod shapes;
+
+use vector::*;
+use render::*;
+use figures::Triangle;
+use shapes::Tetrahedron;
+
+use std::iter::Extend;
 use stdweb::web::TypedArray;
 
-fn triangulate_2d(contour: TypedArray<f32>, z: f64, r: f64, g: f64, b: f64) -> TypedArray<f32> {
-    let contour = contour.to_vec();
+fn scene(time: f64) -> TypedArray<f32> {
+    let time = time as f32;
 
-    let n = contour.len();
-    if n < 6 {
-        js! {
-            alert("Can't triangulate " + n / 2 + " vertices");
+    let shapes= vec![
+        Triangle {
+            a: ORIGIN,
+            b: ORIGIN,
+            c: Vector { x: time.cos(), y: time.sin(), z: 0.0 },
+            color: RED
         }
-        panic!();
+//        Tetrahedron {
+//            base: Triangle {
+//                a: UNIT_X,
+//                b: UNIT_Y,
+//                c: UNIT_Z,
+//
+//                color: RED
+//            },
+//            peak: Point {
+//                position: ORIGIN,
+//                color: GRAY
+//            }
+//        }.scale_eq(0.3).shift_x(-0.5),
+//
+//        Tetrahedron {
+//            base: Triangle {
+//                a: UNIT_X,
+//                b: UNIT_Y,
+//                c: UNIT_Z,
+//
+//                color: GREEN
+//            },
+//            peak: Point {
+//                position: ORIGIN,
+//                color: GRAY
+//            }
+//        }.rotate_yz(std::f32::consts::PI / 3.0).scale_eq(0.3),
+//
+//        Tetrahedron {
+//            base: Triangle {
+//                a: UNIT_X,
+//                b: UNIT_Y,
+//                c: UNIT_Z,
+//
+//                color: BLUE
+//            },
+//            peak: Point {
+//                position: ORIGIN,
+//                color: GRAY
+//            }
+//        }.rotate_yz(2.0 * std::f32::consts::PI / 3.0).scale_eq(0.3).shift_x(0.5),
+    ];
+
+    let mut simplexes = vec![];
+    for shape in shapes {
+        simplexes.extend(Renderable::render(shape));
     }
 
-    let z = z as f32;
-    let r = r as f32;
-    let g = g as f32;
-    let b = b as f32;
-
-    let mut center = (0.0, 0.0);
-    for i in (0..n).step_by(2) {
-        center.0 = center.0 + contour[i];
-        center.1 = center.1 + contour[i+1];
-    }
-    center.0 = 2.0 * center.0 / (n as f32);
-    center.1 = 2.0 * center.1 / (n as f32);
-
-    let center = vec![center.0, center.1, z, r, g, b];
-
-    let mut result: Vec<f32> = vec![];
-    for i in (0..n-2).step_by(2) {
-        result.extend_from_slice(&[contour[i],   contour[i+1], z, r, g, b]);
-        result.extend_from_slice(&[contour[i+2], contour[i+3], z, r, g, b]);
-        result.extend_from_slice(&center[..]);
-    }
-    result.extend_from_slice(&[contour[n-2],   contour[n-1], z, r, g, b]);
-    result.extend_from_slice(&[contour[0], contour[1], z, r, g, b]);
-    result.extend_from_slice(&center[..]);
-
-
-    (&result[..]).into()
+    let raw = Simplex2D::encode_all(simplexes);
+    (&raw[..]).into()
 }
 
 fn main() {
@@ -50,7 +84,7 @@ fn main() {
 
     js! {
         window.wasm = {};
-        window.wasm.triangulate_2d = @{triangulate_2d};
+        window.wasm.scene = @{scene};
     }
 
     stdweb::event_loop();

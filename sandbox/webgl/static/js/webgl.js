@@ -2,43 +2,21 @@ const canvas = document.getElementById('frame');
 const gl = canvas.getContext('webgl');
 let program;
 
-let points;
-function initialize() {
-    const figures = [
-        move_2d(stretch_2d(polygon(300), {x: 0.5, y: 0.5}), {x: -0.5, y: -0.5}),
-        move_2d(stretch_2d(polygon(400), {x: 0.5, y: 0.5}), {x: -0.3, y: -0.3}),
-        move_2d(stretch_2d(polygon(500), {x: 0.5, y: 0.5}), {x: -0.1, y: -0.1}),
-        move_2d(stretch_2d(polygon(600), {x: 0.5, y: 0.5}), {x:  0.1, y:  0.1}),
-        move_2d(stretch_2d(polygon(700), {x: 0.5, y: 0.5}), {x:  0.3, y:  0.3}),
-        move_2d(stretch_2d(polygon(800), {x: 0.5, y: 0.5}), {x:  0.5, y:  0.5})
-    ];
+function draw(time) {
+    console.log(time);
 
-    let n = figures.length;
-
-    const js_start = performance.now();
-    const js_result = figures.map((figure, i) => {
-        const rgb = random_color();
-        return triangulate_2d(figure, i / n, rgb);
-    });
-    console.log("js time: " + (performance.now() - js_start));
-
-    const wasm_start = performance.now();
-    const wasm_result = figures.map((figure, i) => {
-        const rgb = random_color();
-        return window.wasm.triangulate_2d(new Float32Array(figure), i / n, rgb[0], rgb[1], rgb[2]);
-    });
-    console.log("wasm time: " + (performance.now() - wasm_start));
-
-    points = concatenate(Float32Array, wasm_result);
-}
-
-function draw() {
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
-    let n = points.length / 6;
+    time = (time % 360) / 360;
+    console.log(time);
+    let scene = window.wasm.scene(time);
+    let n = scene.length / 6;
+    for (let i = 0; i < scene.length; i += 6) {
+        console.log("(" + scene[i] + ", " + scene[i+1] + ", " + scene[i+2] + ")");
+    }
 
-    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, scene, gl.STATIC_DRAW);
 
     let positionAttribLocation = gl.getAttribLocation(program, 'vertexPosition');
     gl.vertexAttribPointer(
@@ -67,7 +45,9 @@ function draw() {
     gl.enable(gl.DEPTH_TEST);
     gl.useProgram(program);
 
-    gl.drawArrays(gl.TRIANGLES, 0, n);
+    gl.drawArrays(gl.LINE_STRIP, 0, n);
+
+    requestAnimationFrame(draw);
 }
 
 function InitWebGL() {
@@ -126,12 +106,11 @@ function StartWebGL(vertexShaderText, fragmentShaderText) {
         return;
     }
 
-    draw();
+    requestAnimationFrame(draw);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     Rust.webgl_wasm.then(function () {
-        initialize();
         InitWebGL();
     });
 });
