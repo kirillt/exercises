@@ -1,8 +1,6 @@
 use vector::*;
 
 use std::iter::Extend;
-use rand::prelude::thread_rng;
-use rand::Rng;
 
 #[derive(Clone)]
 pub struct Color {
@@ -14,16 +12,6 @@ pub struct Color {
 impl Color {
     pub fn rgb(r: f32, g: f32, b: f32) -> Color {
         Color { r, g, b}
-    }
-
-    pub fn random() -> Color {
-        // seems to not work in WebAssembly
-        let mut rng = thread_rng();
-        Color {
-            r: rng.gen_range(0.0, 0.1),
-            g: rng.gen_range(0.0, 0.1),
-            b: rng.gen_range(0.0, 0.1)
-        }
     }
 
     pub fn from_vector(v: &Vector) -> Color { //hack

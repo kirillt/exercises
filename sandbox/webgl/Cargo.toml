@@ -1,7 +1,0 @@
-[package]
-name = "webgl-wasm"
-version = "0.1.0"
-
-[dependencies]
-stdweb = "0.4.7"
-rand = "0.5.4"
