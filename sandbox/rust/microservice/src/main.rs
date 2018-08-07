@@ -1,5 +1,6 @@
 #![feature(proc_macro_non_items)]
 #![feature(proc_macro)]
+#![feature(box_syntax)]
 extern crate maud;
 
 extern crate url;
@@ -51,9 +52,10 @@ impl Service for Microservice {
     fn call(&self, request: Request) -> Self::Future {
         let db = match connect_to_db() {
             Some(connection) => connection,
-            None => return Box::new(futures::future::ok(
+            //return box futures::future::ok(...)
+            None => return box futures::future::ok(
                 Response::new().with_status(StatusCode::InternalServerError)
-            ))
+            )
         };
 
         match (request.method(), request.path()) {
@@ -63,7 +65,7 @@ impl Service for Microservice {
                     .and_then(parse_form)
                     .and_then(move |msg| write_to_db(&db, msg))
                     .then(make_post_response);
-                Box::new(future)
+                box future
             }
             (&Get, "/") => {
                 let range = request.query()
@@ -77,12 +79,12 @@ impl Service for Microservice {
                     Ok(range) => make_get_response(query_db(&db, range)),
                     Err(msg) => make_error_response(&msg[..])
                 };
-                Box::new(response)
+                box response
             }
             _ => {
                 info!("Received: {:?}", request);
-                Box::new(futures::future::ok(Response::new()
-                    .with_status(StatusCode::NotFound)))
+                box futures::future::ok(Response::new()
+                    .with_status(StatusCode::NotFound))
             }
         }
     }

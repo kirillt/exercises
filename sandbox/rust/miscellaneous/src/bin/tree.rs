@@ -1,3 +1,5 @@
+#![feature(box_syntax)]
+
 use std::iter::FromIterator;
 use std::cmp;
 
@@ -23,8 +25,8 @@ impl<T> Tree<T> {
 
     fn union(left: Tree<Option<T>>, right: Tree<Option<T>>) -> Tree<Option<T>> {
         Tree::Branch {
-            left: Box::new(left),
-            right: Box::new(right),
+            left: box left,
+            right: box right,
             value: None
         }
     }
@@ -48,7 +50,7 @@ impl<T> Tree<T> {
     }
 
     fn grow(forest: Vec<Tree<Option<T>>>) -> Vec<Tree<Option<T>>> {
-        let mut result = Vec::new();
+        let mut result = vec![];
         let mut left = None;
         for tree in forest.into_iter() {
             if left.is_none() {
@@ -91,7 +93,7 @@ impl<T> Tree<T> {
         self.fold(&|| Tree::Nil, &|x| Tree::Leaf(on_leaf(x)),
                   &|l,r,v| Tree::Branch {
                       value: on_branch(l.value(), r.value(), v),
-                      left: Box::new(l), right: Box::new(r)
+                      left: box l, right: box r
                   })
     }
 
@@ -125,7 +127,7 @@ impl<T> FromIterator<T> for Tree<Option<T>> {
 fn main() {
     println!("1 x 2\n\t{:?}\n", Tree::join(1,2));
 
-    let mut leaves: Vec<usize> = Vec::new();
+    let mut leaves: Vec<usize> = vec![];
     for i in 1..10 {
         leaves.push(i);
         println!("{:?}\n\t{:?}\n", leaves,
