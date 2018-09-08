@@ -1,5 +1,0 @@
-Hi guys,
-this is test input for
-my implementation of
-Huffman algorithm
-\m/
