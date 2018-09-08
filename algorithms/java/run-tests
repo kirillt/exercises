@@ -1,2 +1,0 @@
-#!/bin/bash
-java -cp .:/usr/share/java/junit4.jar org.junit.runner.JUnitCore $1

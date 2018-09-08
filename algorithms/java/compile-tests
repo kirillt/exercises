@@ -1,2 +1,0 @@
-#!/bin/bash
-javac -cp .:/usr/share/java/junit4.jar $1
