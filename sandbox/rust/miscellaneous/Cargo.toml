@@ -1,7 +1,0 @@
-[package]
-name = "sandbox"
-version = "0.1.0"
-authors = ["Kirill Taran"]
-
-[dependencies]
-rand = "0.3.14"

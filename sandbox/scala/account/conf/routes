@@ -1,5 +1,0 @@
-POST    /create/:name                 controllers.AccountController.create(name: String)
-GET     /balance/:name                controllers.AccountController.balance(name: String)
-
-POST    /deposit                      controllers.AccountController.deposit
-POST    /withdrawal                   controllers.AccountController.withdrawal
